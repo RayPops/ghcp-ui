@@ -188,12 +188,17 @@ export class CopilotService {
   /** Build the BYOK provider config if configured */
   private get providerConfig() {
     if (!this.config.copilot.useByok) return undefined;
-    return {
+    const cfg: Record<string, unknown> = {
       type: "openai" as const,
       baseUrl: this.config.azure.foundryEndpoint,
-      wireApi: "responses" as const,
-      apiKey: this.config.azure.foundryApiKey,
+      wireApi: "completions" as const,
     };
+    if (this.config.azure.foundryBearerToken) {
+      cfg.bearerToken = this.config.azure.foundryBearerToken;
+    } else {
+      cfg.apiKey = this.config.azure.foundryApiKey;
+    }
+    return cfg;
   }
 
   /** Build merged MCP servers: global (admin) → user (persistent) → per-session (ephemeral) */

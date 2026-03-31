@@ -1,3 +1,11 @@
+import { config as dotenvConfig } from "dotenv";
+import { resolve, dirname } from "node:path";
+import { fileURLToPath as toFilePath } from "node:url";
+
+// Load .env from project root (two levels up from src/server/src/)
+const __serverDir = dirname(toFilePath(import.meta.url));
+dotenvConfig({ path: resolve(__serverDir, "..", "..", "..", ".env") });
+
 import express from "express";
 import morgan from "morgan";
 import path from "node:path";

@@ -8,6 +8,7 @@ export interface AppConfig {
   azure: {
     foundryEndpoint: string;
     foundryApiKey: string;
+    foundryBearerToken: string;
     foundryModel: string;
     storageConnectionString: string;
     storageAccountName: string;
@@ -62,10 +63,11 @@ export function loadConfig(): AppConfig {
 
   const foundryEndpoint = process.env.AZURE_FOUNDRY_ENDPOINT ?? "";
   const foundryApiKey = process.env.AZURE_FOUNDRY_API_KEY ?? "";
+  const foundryBearerToken = process.env.AZURE_FOUNDRY_BEARER_TOKEN ?? "";
   const foundryModel = process.env.AZURE_FOUNDRY_MODEL ?? "gpt-5.4";
   const githubToken = process.env.COPILOT_GITHUB_TOKEN;
 
-  const useByok = Boolean(foundryEndpoint && foundryApiKey);
+  const useByok = Boolean(foundryEndpoint && (foundryApiKey || foundryBearerToken));
 
   return {
     port: parseInt(process.env.PORT ?? "3001", 10),
@@ -74,6 +76,7 @@ export function loadConfig(): AppConfig {
     azure: {
       foundryEndpoint,
       foundryApiKey,
+      foundryBearerToken,
       foundryModel,
       storageConnectionString: process.env.AZURE_STORAGE_CONNECTION_STRING ?? "",
       storageAccountName: process.env.AZURE_STORAGE_ACCOUNT_NAME ?? "",

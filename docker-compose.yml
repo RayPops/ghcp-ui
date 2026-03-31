@@ -7,3 +7,12 @@ services:
     environment:
       - NODE_ENV=production
     restart: unless-stopped
+
+  scheduling-mcp:
+    build: ./scheduling
+    ports:
+      - "3002:3002"
+    environment:
+      - MCP_PORT=3002
+      - SCHEDULING_CSV_PATH=data/work_orders.csv
+    restart: unless-stopped

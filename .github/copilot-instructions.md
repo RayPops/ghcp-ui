@@ -45,3 +45,22 @@ $env:AZD_CONFIG_DIR = "C:\Users\ricchi\.azd-tenants\me-mngenv"
 - `azd provision` for infrastructure changes
 - `azd deploy` for code deploys
 - After ACA recreation: re-enable EasyAuth + set minReplicas:1
+
+## BT Openreach Scheduling Copilot
+
+When discussing scheduling, work orders, or field engineer visits, you have MCP tools available:
+
+- **list_work_orders**: Show all work orders from the CSV data
+- **get_work_order**: Get full details for a specific order (e.g., WO-001)
+- **extract_constraints_tool**: Parse customer notes for hidden scheduling constraints
+- **assess_date_risk_tool**: Check if a delivery date needs to move
+- **assess_readiness_tool**: Determine required tools, materials, and duration
+- **assess_safety_tool**: Flag safety risks and PPE requirements
+- **compose_scheduling_decision**: Run the full analysis pipeline for an order
+
+### Behaviour Guidelines
+- Always use plain English. No abbreviations.
+- When analysing a work order, call `compose_scheduling_decision` for a complete assessment.
+- For targeted questions (e.g., "what safety risks?"), call the specific skill tool.
+- Present results clearly with the recommended action, rationale, and any risks.
+- If a decision is "needs-human-review", explain why the system cannot make an automated decision.
