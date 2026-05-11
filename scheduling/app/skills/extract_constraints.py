@@ -7,7 +7,7 @@ import logging
 from datetime import date
 from typing import Optional
 
-from app.models import SchedulingConstraints
+from app.models import ExtractionTrace, SchedulingConstraints
 
 logger = logging.getLogger(__name__)
 
@@ -107,6 +107,9 @@ def extract_scheduling_constraints(
 
     # Extract earliest allowed date from "do not attend before" or "holiday until"
     for pattern in [_NOT_BEFORE_PATTERN, _HOLIDAY_UNTIL_PATTERN]:
+        pattern_name = (
+            "_NOT_BEFORE_PATTERN" if pattern is _NOT_BEFORE_PATTERN else "_HOLIDAY_UNTIL_PATTERN"
+        )
         match = pattern.search(customer_notes)
         if match:
             try:
@@ -114,14 +117,31 @@ def extract_scheduling_constraints(
                 if result.earliest_allowed_date is None or extracted > result.earliest_allowed_date:
                     result.earliest_allowed_date = extracted
                     logger.info("Extracted earliest allowed date: %s", extracted)
+                    result.trace.append(
+                        ExtractionTrace(
+                            field="earliest_allowed_date",
+                            value=extracted.isoformat(),
+                            pattern=pattern_name,
+                            source_excerpt=match.group(0),
+                        )
+                    )
             except ValueError:
                 logger.warning("Could not parse date from notes: %s", match.group(0))
 
     # Extract customer availability window
     for pattern, window_label in _AVAILABILITY_PATTERNS:
-        if pattern.search(customer_notes):
+        match = pattern.search(customer_notes)
+        if match:
             result.customer_availability_window = window_label
             logger.info("Extracted availability window: %s", window_label)
+            result.trace.append(
+                ExtractionTrace(
+                    field="customer_availability_window",
+                    value=window_label,
+                    pattern=pattern.pattern,
+                    source_excerpt=match.group(0),
+                )
+            )
             break
 
     # Extract special instructions
@@ -130,12 +150,29 @@ def extract_scheduling_constraints(
             instruction = match.group(1).strip().rstrip(".")
             if instruction and instruction not in result.special_instructions:
                 result.special_instructions.append(instruction)
+                result.trace.append(
+                    ExtractionTrace(
+                        field="special_instructions",
+                        value=instruction,
+                        pattern=pattern.pattern,
+                        source_excerpt=match.group(0),
+                    )
+                )
 
     # Check for "do not book" type constraints
-    if re.search(r"do\s+not\s+book", notes_lower):
+    do_not_book_match = re.search(r"do\s+not\s+book", notes_lower)
+    if do_not_book_match:
         if result.earliest_allowed_date is None:
             # Set a far future date to force human review
             result.earliest_allowed_date = date(reference_year, 12, 31)
+            result.trace.append(
+                ExtractionTrace(
+                    field="earliest_allowed_date",
+                    value=date(reference_year, 12, 31).isoformat(),
+                    pattern="DO_NOT_BOOK",
+                    source_excerpt=customer_notes[do_not_book_match.start():do_not_book_match.end()],
+                )
+            )
 
     logger.info(
         "Extracted constraints for notes (%d chars): earliest=%s, window=%s, instructions=%d",

@@ -5,7 +5,7 @@ from __future__ import annotations
 import logging
 import re
 
-from app.models import VisitReadiness
+from app.models import ExtractionTrace, VisitReadiness
 
 logger = logging.getLogger(__name__)
 
@@ -94,6 +94,7 @@ def assess_visit_readiness(
     duration = base["duration"]
     confidence = "high" if photo_provided_flag else "medium"
     explanations: list[str] = []
+    trace: list[ExtractionTrace] = []
 
     notes_lower = customer_notes.lower() if customer_notes else ""
 
@@ -103,10 +104,18 @@ def assess_visit_readiness(
         tools.append("ground mat")
         explanations.append("Gravel surface may need ground protection.")
         duration += 15
+        trace.append(ExtractionTrace(
+            field="required_tools", value="ground mat",
+            pattern="DRIVEWAY_SURFACE=gravel", source_excerpt="",
+        ))
     elif surface == "block paving":
         tools.append("paving lifter")
         explanations.append("Block paving may need careful lifting and replacement.")
         duration += 20
+        trace.append(ExtractionTrace(
+            field="required_tools", value="paving lifter",
+            pattern="DRIVEWAY_SURFACE=block paving", source_excerpt="",
+        ))
 
     # Adjust for long cable runs mentioned in notes
     long_run_match = re.search(r"(\d{2,3})\s*m\b", notes_lower)
@@ -116,37 +125,73 @@ def assess_visit_readiness(
             materials.append(f"extended cable run ({run_length}m)")
             duration += 30
             explanations.append(f"Long cable run of approximately {run_length} metres noted.")
+            trace.append(ExtractionTrace(
+                field="required_materials",
+                value=f"extended cable run ({run_length}m)",
+                pattern=r"(\d{2,3})\s*m\b",
+                source_excerpt=long_run_match.group(0),
+            ))
 
     # Check for duct issues
-    if re.search(r"duct\s+block", notes_lower):
+    duct_match = re.search(r"duct\s+block", notes_lower)
+    if duct_match:
         tools.append("duct rod set (heavy duty)")
         materials.append("duct bore equipment")
         duration += 60
         confidence = "low"
         explanations.append("Duct blockage reported. May require duct bore.")
+        trace.append(ExtractionTrace(
+            field="confidence", value="low",
+            pattern=r"duct\s+block",
+            source_excerpt=customer_notes[duct_match.start():duct_match.end()] if customer_notes else "",
+        ))
 
     # Check for cherry picker / scaffolding
-    if re.search(r"cherry\s+picker|scaffolding", notes_lower):
+    cherry_match = re.search(r"cherry\s+picker|scaffolding", notes_lower)
+    if cherry_match:
         tools.append("cherry picker or scaffolding (pre-book)")
         duration += 60
         explanations.append("High-level access equipment needed.")
+        trace.append(ExtractionTrace(
+            field="required_tools", value="cherry picker or scaffolding (pre-book)",
+            pattern=r"cherry\s+picker|scaffolding",
+            source_excerpt=customer_notes[cherry_match.start():cherry_match.end()] if customer_notes else "",
+        ))
 
     # Check for cable jointing kit mentioned
-    if re.search(r"jointing\s+kit", notes_lower):
+    jointing_match = re.search(r"jointing\s+kit", notes_lower)
+    if jointing_match:
         if "cable jointing kit" not in tools:
             tools.append("cable jointing kit")
         explanations.append("Cable jointing kit specifically requested in notes.")
+        trace.append(ExtractionTrace(
+            field="required_tools", value="cable jointing kit",
+            pattern=r"jointing\s+kit",
+            source_excerpt=customer_notes[jointing_match.start():jointing_match.end()] if customer_notes else "",
+        ))
 
     # Check for raised floor routing
-    if re.search(r"raised\s+floor", notes_lower):
+    raised_match = re.search(r"raised\s+floor", notes_lower)
+    if raised_match:
         tools.append("raised floor tile lifter")
         explanations.append("Raised floor cable routing noted.")
+        trace.append(ExtractionTrace(
+            field="required_tools", value="raised floor tile lifter",
+            pattern=r"raised\s+floor",
+            source_excerpt=customer_notes[raised_match.start():raised_match.end()] if customer_notes else "",
+        ))
 
     # Check for previous failed attempt
-    if re.search(r"previous\s+(?:attempt|visit)\s+failed", notes_lower):
+    prev_match = re.search(r"previous\s+(?:attempt|visit)\s+failed", notes_lower)
+    if prev_match:
         confidence = "low"
         duration += 30
         explanations.append("Previous attempt failed. Extra time allocated for contingency.")
+        trace.append(ExtractionTrace(
+            field="confidence", value="low",
+            pattern=r"previous\s+(?:attempt|visit)\s+failed",
+            source_excerpt=customer_notes[prev_match.start():prev_match.end()] if customer_notes else "",
+        ))
 
     # Reduce confidence if no photo and non-trivial job
     if not photo_provided_flag and duration > 90:
@@ -170,4 +215,5 @@ def assess_visit_readiness(
         estimated_duration_minutes=duration,
         confidence=confidence,
         explanation=explanation,
+        trace=trace,
     )

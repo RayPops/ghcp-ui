@@ -6,3 +6,6 @@ __pycache__/
 *.pyc
 *.egg-info/
 .pytest_cache/
+
+# Large BT delay data (1.4 GB, distributed separately, never committed)
+data/bt_real_data/

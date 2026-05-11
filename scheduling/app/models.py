@@ -4,7 +4,21 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from datetime import date
-from typing import Optional
+from typing import Any, Optional
+
+
+@dataclass
+class ExtractionTrace:
+    """One audit-trail entry: which skill rule fired and what it found.
+
+    Used by the cleaning pipeline to populate ``agent_actions.jsonl``. Strictly
+    additive on the skill output models — older callers ignore it harmlessly.
+    """
+
+    field: str               # the SchedulingDecision-side field this contributes to
+    value: Any               # the extracted value (date, str, bool, list, ...)
+    pattern: str             # rule / regex constant name, e.g. "_NOT_BEFORE_PATTERN"
+    source_excerpt: str = ""  # verbatim substring of the note that triggered it ("" when flag-only)
 
 
 @dataclass
@@ -37,6 +51,7 @@ class SchedulingConstraints:
     earliest_allowed_date: Optional[date] = None
     customer_availability_window: str = ""
     special_instructions: list[str] = field(default_factory=list)
+    trace: list[ExtractionTrace] = field(default_factory=list)
 
 
 @dataclass
@@ -58,6 +73,7 @@ class VisitReadiness:
     estimated_duration_minutes: int = 60
     confidence: str = "medium"
     explanation: str = ""
+    trace: list[ExtractionTrace] = field(default_factory=list)
 
 
 @dataclass
@@ -67,6 +83,36 @@ class SafetyAssessment:
     safety_equipment: list[str] = field(default_factory=lambda: ["standard PPE"])
     extra_engineer_required: bool = False
     safety_risks: list[str] = field(default_factory=list)
+    explanation: str = ""
+    trace: list[ExtractionTrace] = field(default_factory=list)
+
+
+@dataclass
+class DelayRecord:
+    """A single delay record from the delay history data."""
+
+    project_name: str
+    task_name: str
+    holding_reason: str
+    delay_start_date: str
+    delay_end_date: str
+    status: str
+    delay_type: str
+    delay_summary: str
+    ccd_impact_days: str
+
+
+@dataclass
+class DelayHistory:
+    """Output of Skill E: delay history lookup."""
+
+    project_name: str
+    total_delays: int = 0
+    ongoing_delays: int = 0
+    resolved_delays: int = 0
+    delay_types: dict = field(default_factory=dict)
+    top_reasons: list[str] = field(default_factory=list)
+    records: list[DelayRecord] = field(default_factory=list)
     explanation: str = ""
 
 

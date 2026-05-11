@@ -1,0 +1,44 @@
+<?xml version='1.0' encoding='utf-8'?>
+<dsScheduleData xmlns="http://360Scheduling.com/Schema/dsScheduleData.xsd">
+  <Input_Reference>
+    <datetime>2026-05-06T12:00:00+00:00</datetime>
+    <id>00000000000000000000000000000000</id>
+    <description>BT Openreach push: ONEA73446139</description>
+    <input_type>CHANGE</input_type>
+    <dataset_id>CC_LIVE</dataset_id>
+  </Input_Reference>
+  <Activity>
+    <id>ONEA73446139</id>
+    <activity_class_id>CALL</activity_class_id>
+    <activity_type_id>INSTALL</activity_type_id>
+    <location_id>ONEA73446139</location_id>
+    <do_on_site>false</do_on_site>
+    <duration>PT180M</duration>
+    <base_value>10000</base_value>
+  </Activity>
+  <Activity_SLA>
+    <sla_type_id>Normal</sla_type_id>
+    <activity_id>ONEA73446139</activity_id>
+    <datetime_start>2025-11-25T09:00:00+00:00</datetime_start>
+    <datetime_end>2025-11-26T17:00:00+00:00</datetime_end>
+    <priority>1</priority>
+    <start_based>true</start_based>
+  </Activity_SLA>
+  <Activity_Status>
+    <activity_id>ONEA73446139</activity_id>
+    <status_id>0</status_id>
+    <date_time_status>2025-11-25T09:00:00+00:00</date_time_status>
+    <visit_id>1</visit_id>
+    <fixed>false</fixed>
+    <date_time_stamp>2025-11-25T09:00:00+00:00</date_time_stamp>
+  </Activity_Status>
+  <Location>
+    <id>ONEA73446139</id>
+    <latitude>51.5135</latitude>
+    <longitude>-0.3045</longitude>
+  </Location>
+  <Activity_Skill>
+    <skill_id>fibre</skill_id>
+    <activity_id>ONEA73446139</activity_id>
+  </Activity_Skill>
+</dsScheduleData>
