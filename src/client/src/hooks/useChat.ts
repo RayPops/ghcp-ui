@@ -4,36 +4,146 @@ import type { ActionTrailEntry, ChatMessage, ToolEvent, SessionInfo } from "../t
 const API_BASE = "/api";
 
 /**
- * Build a short, plain-text summary for the Action Trail from a raw tool
- * result. The server already truncates the SDK content to 500 chars; we
- * further trim and try to surface the most useful first line.
+ * Unwrap the ``{ result: "<json string>" }`` envelope that Python MCP tools
+ * wrap their JSON output in when piped back through the SDK. Returns whatever
+ * the inner payload was (object, array, string), or the original content if
+ * it doesn't match the envelope shape.
  */
-function summariseToolContent(content: string | undefined): string | undefined {
+function unwrapToolResult(content: string): unknown {
+  try {
+    const outer: unknown = JSON.parse(content);
+    if (outer && typeof outer === "object" && !Array.isArray(outer) && "result" in (outer as Record<string, unknown>)) {
+      const inner = (outer as Record<string, unknown>).result;
+      if (typeof inner === "string") {
+        try {
+          return JSON.parse(inner);
+        } catch {
+          return inner;
+        }
+      }
+      return inner;
+    }
+    return outer;
+  } catch {
+    return content;
+  }
+}
+
+function asArray<T = unknown>(v: unknown): T[] {
+  return Array.isArray(v) ? (v as T[]) : [];
+}
+
+/**
+ * Per-tool formatters that turn a parsed scheduling tool result into a single
+ * readable line for the Action Trail. Keyed by MCP tool name. Returning
+ * ``undefined`` means "fall back to the generic gist below".
+ */
+function formatSchedulingResult(toolName: string, parsed: unknown): string | undefined {
+  if (parsed && typeof parsed === "object" && "error" in (parsed as Record<string, unknown>)) {
+    const err = (parsed as Record<string, unknown>).error;
+    if (typeof err === "string") return `error: ${err}`;
+  }
+  const p = (parsed && typeof parsed === "object") ? (parsed as Record<string, unknown>) : null;
+  switch (toolName) {
+    case "list_work_orders":
+      return Array.isArray(parsed) ? `${parsed.length} orders loaded` : undefined;
+    case "get_work_order":
+      if (!p) return undefined;
+      return [
+        p.service_type,
+        p.postcode,
+        p.committed_delivery_date ? `committed ${p.committed_delivery_date}` : null,
+      ].filter(Boolean).join(" · ") || undefined;
+    case "extract_constraints_tool": {
+      if (!p) return undefined;
+      const bits: string[] = [];
+      if (p.earliest_allowed_date) bits.push(`earliest ${p.earliest_allowed_date}`);
+      if (p.customer_availability_window) bits.push(String(p.customer_availability_window));
+      const si = asArray(p.special_instructions).length;
+      if (si > 0) bits.push(`${si} note${si === 1 ? "" : "s"}`);
+      return bits.length ? bits.join(" · ") : "no constraints found in notes";
+    }
+    case "assess_date_risk_tool": {
+      if (!p) return undefined;
+      const change = p.date_change_recommended ? "move date" : "keep date";
+      const to = p.revised_delivery_date ? ` → ${p.revised_delivery_date}` : "";
+      const reason = p.reason_code ? ` · ${String(p.reason_code).replace(/_/g, " ")}` : "";
+      return `${change}${to}${reason}`;
+    }
+    case "assess_readiness_tool": {
+      if (!p) return undefined;
+      const tools = asArray<string>(p.required_tools).slice(0, 2).join(", ");
+      const dur = p.estimated_duration_minutes ? `${p.estimated_duration_minutes} min` : "";
+      const conf = p.confidence ? `${p.confidence} confidence` : "";
+      return [dur, tools, conf].filter(Boolean).join(" · ") || undefined;
+    }
+    case "assess_safety_tool": {
+      if (!p) return undefined;
+      const risks = asArray<string>(p.safety_risks).slice(0, 2).join(", ");
+      const extra = p.extra_engineer_required ? "+1 engineer" : "";
+      return [risks || "no specific risks", extra].filter(Boolean).join(" · ");
+    }
+    case "compose_scheduling_decision": {
+      if (!p) return undefined;
+      const action = p.recommended_action ? String(p.recommended_action).replace(/-/g, " ") : "?";
+      const date = p.planned_visit_date ? ` → ${p.planned_visit_date}` : "";
+      return `${action}${date}`;
+    }
+    case "push_to_pso_tool": {
+      if (!p) return undefined;
+      const ok = p.success !== false;
+      const status = p.http_status ? `HTTP ${p.http_status}` : (ok ? "pushed" : "failed");
+      const id = p.activity_id || p.internal_id ? ` · #${p.activity_id ?? p.internal_id}` : "";
+      return `${status}${id}`;
+    }
+    case "clean_work_orders_tool": {
+      if (!p) return undefined;
+      const n = p.processed ?? 0;
+      const decisions = (p.decisions && typeof p.decisions === "object") ? p.decisions as Record<string, unknown> : {};
+      const breakdown = Object.entries(decisions)
+        .map(([k, v]) => `${v} ${String(k).replace(/-/g, " ")}`)
+        .join(", ");
+      return `${n} cleaned${breakdown ? ` · ${breakdown}` : ""}`;
+    }
+    case "lookup_delay_history_tool":
+      if (!p) return undefined;
+      return `${asArray(p.history).length} delay event(s)`;
+    default:
+      return undefined;
+  }
+}
+
+/**
+ * Build a short, plain-text summary for the Action Trail from a raw tool
+ * result. Tries a per-tool formatter first; falls back to a generic JSON gist
+ * or a truncated one-liner.
+ */
+function summariseToolContent(toolName: string | undefined, content: string | undefined): string | undefined {
   if (!content) return undefined;
   const trimmed = content.trim();
   if (!trimmed) return undefined;
-  // If the content is JSON, prefer a one-line gist over the full blob.
-  if (trimmed.startsWith("{") || trimmed.startsWith("[")) {
-    try {
-      const parsed = JSON.parse(trimmed);
-      if (Array.isArray(parsed)) {
-        return `${parsed.length} item(s)`;
-      }
-      if (parsed && typeof parsed === "object") {
-        // Promote a handful of fields the scheduling MCP tools commonly return.
-        const promoted = ["recommended_action", "decision", "http_status", "success", "order_id"]
-          .filter((k) => k in parsed)
-          .map((k) => `${k}: ${String((parsed as Record<string, unknown>)[k])}`)
-          .join(" · ");
-        if (promoted) return promoted;
-      }
-    } catch {
-      // Not JSON — fall through to the raw-text path.
-    }
+  const parsed = unwrapToolResult(trimmed);
+  if (toolName) {
+    const formatted = formatSchedulingResult(toolName, parsed);
+    if (formatted) return formatted;
   }
-  const oneLine = trimmed.replace(/\s+/g, " ");
+  // Generic fallback for unknown tools.
+  if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
+    const obj = parsed as Record<string, unknown>;
+    const promoted = ["recommended_action", "decision", "http_status", "success", "order_id"]
+      .filter((k) => k in obj)
+      .map((k) => `${k}: ${String(obj[k])}`)
+      .join(" · ");
+    if (promoted) return promoted;
+  }
+  if (Array.isArray(parsed)) return `${parsed.length} item(s)`;
+  const asText = typeof parsed === "string" ? parsed : trimmed;
+  const oneLine = asText.replace(/\s+/g, " ");
   return oneLine.length > 240 ? `${oneLine.slice(0, 237)}…` : oneLine;
 }
+
+// Exported for unit testing only.
+export const __testing = { summariseToolContent, unwrapToolResult, formatSchedulingResult };
 
 export function useChat() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -273,6 +383,7 @@ export function useChat() {
                     mcpServerName: startEvt?.mcpServerName,
                     success: data.success !== false,
                     summary: summariseToolContent(
+                      startEvt?.toolName,
                       typeof data.content === "string" ? data.content : undefined
                     ),
                     error: typeof data.error === "string" ? data.error : undefined,

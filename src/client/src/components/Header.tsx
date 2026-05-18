@@ -1,4 +1,4 @@
-import { RadioTower, Github, Menu, Settings, FolderOpen, LogOut, User } from "lucide-react";
+import { RadioTower, Github, Menu, Settings, FolderOpen, LogOut, User, PanelLeftClose, PanelLeftOpen, PanelRightClose, PanelRightOpen } from "lucide-react";
 
 interface HeaderProps {
   sessionModel: string | null;
@@ -7,9 +7,24 @@ interface HeaderProps {
   onOpenSettings: () => void;
   onOpenWorkspace: () => void;
   userName?: string;
+  workOrdersOpen: boolean;
+  actionTrailOpen: boolean;
+  onToggleWorkOrders: () => void;
+  onToggleActionTrail: () => void;
 }
 
-export function Header({ sessionModel, isConnected, onToggleSidebar, onOpenSettings, onOpenWorkspace, userName }: HeaderProps) {
+export function Header({
+  sessionModel,
+  isConnected,
+  onToggleSidebar,
+  onOpenSettings,
+  onOpenWorkspace,
+  userName,
+  workOrdersOpen,
+  actionTrailOpen,
+  onToggleWorkOrders,
+  onToggleActionTrail,
+}: HeaderProps) {
   return (
     <header className="flex items-center justify-between px-3 sm:px-6 py-3 border-b border-zinc-800 bg-zinc-950/80 backdrop-blur-sm safe-top">
       <div className="flex items-center gap-2 sm:gap-3">
@@ -57,6 +72,35 @@ export function Header({ sessionModel, isConnected, onToggleSidebar, onOpenSetti
             <span className="max-w-[120px] truncate">{userName}</span>
           </div>
         )}
+
+        <button
+          onClick={onToggleWorkOrders}
+          className="p-2 rounded-lg hover:bg-zinc-800 text-zinc-500 hover:text-zinc-300 transition-colors min-w-[40px] min-h-[40px] hidden sm:flex items-center justify-center"
+          aria-label={workOrdersOpen ? "Hide work orders pane" : "Show work orders pane"}
+          aria-pressed={workOrdersOpen}
+          title={workOrdersOpen ? "Hide work orders" : "Show work orders"}
+          data-testid="toggle-work-orders"
+        >
+          {workOrdersOpen ? (
+            <PanelLeftClose className="w-5 h-5" />
+          ) : (
+            <PanelLeftOpen className="w-5 h-5" />
+          )}
+        </button>
+        <button
+          onClick={onToggleActionTrail}
+          className="p-2 rounded-lg hover:bg-zinc-800 text-zinc-500 hover:text-zinc-300 transition-colors min-w-[40px] min-h-[40px] hidden sm:flex items-center justify-center"
+          aria-label={actionTrailOpen ? "Hide action trail pane" : "Show action trail pane"}
+          aria-pressed={actionTrailOpen}
+          title={actionTrailOpen ? "Hide action trail" : "Show action trail"}
+          data-testid="toggle-action-trail"
+        >
+          {actionTrailOpen ? (
+            <PanelRightClose className="w-5 h-5" />
+          ) : (
+            <PanelRightOpen className="w-5 h-5" />
+          )}
+        </button>
 
         <button
           onClick={onOpenWorkspace}

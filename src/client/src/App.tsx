@@ -19,6 +19,38 @@ export default function App() {
   const [resumingId, setResumingId] = useState<string | null>(null);
   const [userName, setUserName] = useState<string>("");
   /**
+   * Persisted visibility for the left and right side panes. Hydrated from
+   * localStorage on first paint so a user's "hide everything but the chat"
+   * preference survives across refreshes.
+   */
+  const [workOrdersOpen, setWorkOrdersOpen] = useState<boolean>(() => {
+    if (typeof window === "undefined") return true;
+    const v = window.localStorage.getItem("dispatchai-work-orders-open");
+    return v === null ? true : v === "true";
+  });
+  const [actionTrailOpen, setActionTrailOpen] = useState<boolean>(() => {
+    if (typeof window === "undefined") return true;
+    const v = window.localStorage.getItem("dispatchai-action-trail-open");
+    return v === null ? true : v === "true";
+  });
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem("dispatchai-work-orders-open", String(workOrdersOpen));
+    } catch {
+      /* storage may be disabled — ignore */
+    }
+  }, [workOrdersOpen]);
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem("dispatchai-action-trail-open", String(actionTrailOpen));
+    } catch {
+      /* storage may be disabled — ignore */
+    }
+  }, [actionTrailOpen]);
+
+  /**
    * Prefill payload pushed into the InputBar when the user clicks a button
    * in the Work Orders pane. ``nonce`` ensures the same prompt twice in a
    * row still re-runs the effect that fills the textarea.
@@ -71,7 +103,9 @@ export default function App() {
   }, [createSession, fetchSessions, mcpServers, activeFolder]);
 
   const handleNewChatClick = useCallback(() => {
-    handleNewSession("gpt-5.4");
+    // Let the server pick the model from AZURE_FOUNDRY_MODEL so this works on
+    // any deployment where gpt-5.4 isn't actually hosted (we currently run gpt-4o).
+    handleNewSession();
   }, [handleNewSession]);
 
   const handleSelectSession = useCallback(
@@ -141,6 +175,10 @@ export default function App() {
         onOpenSettings={() => setSettingsOpen(true)}
         onOpenWorkspace={() => setWorkspaceOpen(true)}
         userName={userName}
+        workOrdersOpen={workOrdersOpen}
+        actionTrailOpen={actionTrailOpen}
+        onToggleWorkOrders={() => setWorkOrdersOpen((v) => !v)}
+        onToggleActionTrail={() => setActionTrailOpen((v) => !v)}
       />
 
       {error && (
@@ -167,7 +205,7 @@ export default function App() {
           resumingId={resumingId}
         />
 
-        <WorkOrdersPane onPrefillPrompt={handlePrefillPrompt} />
+        <WorkOrdersPane isOpen={workOrdersOpen} onPrefillPrompt={handlePrefillPrompt} />
 
         <div className="flex-1 flex flex-col min-w-0">
           {resumingId ? (
@@ -197,7 +235,7 @@ export default function App() {
           />
         </div>
 
-        <ActionTrailPane entries={actionTrail} />
+        <ActionTrailPane entries={actionTrail} isOpen={actionTrailOpen} />
       </div>
 
       <SettingsDrawer

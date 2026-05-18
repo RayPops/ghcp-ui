@@ -64,7 +64,7 @@ export function loadConfig(): AppConfig {
   const foundryEndpoint = process.env.AZURE_FOUNDRY_ENDPOINT ?? "";
   const foundryApiKey = process.env.AZURE_FOUNDRY_API_KEY ?? "";
   const foundryBearerToken = process.env.AZURE_FOUNDRY_BEARER_TOKEN ?? "";
-  const foundryModel = process.env.AZURE_FOUNDRY_MODEL ?? "gpt-5.4";
+  const foundryModel = process.env.AZURE_FOUNDRY_MODEL ?? "gpt-4o";
   const githubToken = process.env.COPILOT_GITHUB_TOKEN;
 
   const useByok = Boolean(foundryEndpoint && (foundryApiKey || foundryBearerToken));

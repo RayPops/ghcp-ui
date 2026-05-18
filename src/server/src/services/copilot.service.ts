@@ -667,14 +667,20 @@ export class CopilotService {
       } else if (t === "tool.execution_complete") {
         const result = d.result as Record<string, unknown> | undefined;
         const errorMsg = d.error as string | undefined;
+        // Keep the result content large enough for the client to parse the
+        // full JSON envelope from scheduling tools (some payloads are 5-10 KB).
+        // We cap at 64 KB to avoid blowing up the SSE channel on pathological
+        // responses; that's still room for ~16 cleaned work orders.
+        const rawContent = typeof result?.content === "string" ? result.content : undefined;
+        const content = rawContent && rawContent.length > 65536
+          ? rawContent.slice(0, 65536)
+          : rawContent;
         push({
           type: "tool_complete",
           data: JSON.stringify({
             toolCallId: d.toolCallId,
             success: d.success,
-            content: typeof result?.content === "string"
-              ? result.content.slice(0, 500)
-              : undefined,
+            content,
             error: errorMsg || (d.success === false ? "Tool execution failed" : undefined),
           }),
         });

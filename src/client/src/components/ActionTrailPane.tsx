@@ -3,6 +3,8 @@ import type { ActionTrailEntry } from "../types";
 
 interface ActionTrailPaneProps {
   entries: ActionTrailEntry[];
+  /** When false, the pane is not rendered at all (header toggle hides it). */
+  isOpen: boolean;
 }
 
 function formatTime(iso: string): string {
@@ -25,11 +27,15 @@ function formatTime(iso: string): string {
  * so no backend route is needed. The trail resets when a new session starts
  * or when the user switches to a different session.
  */
-export function ActionTrailPane({ entries }: ActionTrailPaneProps) {
+export function ActionTrailPane({ entries, isOpen }: ActionTrailPaneProps) {
   return (
     <aside
       data-testid="action-trail-pane"
-      className="hidden lg:flex w-72 xl:w-80 shrink-0 flex-col border-l border-zinc-800 bg-zinc-950/60"
+      hidden={!isOpen}
+      className={
+        (isOpen ? "hidden lg:flex" : "hidden") +
+        " w-72 xl:w-80 shrink-0 flex-col border-l border-zinc-800 bg-zinc-950/60"
+      }
     >
       <header className="flex items-center justify-between px-3 py-2 border-b border-zinc-800 shrink-0">
         <div className="flex items-center gap-2 text-zinc-300">
@@ -54,27 +60,25 @@ export function ActionTrailPane({ entries }: ActionTrailPaneProps) {
           </div>
         ) : (
           <ol className="px-3 py-2 space-y-2 relative">
-            {/* Vertical guide line behind the timeline dots. */}
-            <div
-              className="absolute left-[19px] top-2 bottom-2 w-px bg-zinc-800/60 pointer-events-none"
-              aria-hidden
-            />
-            {entries.map((e) => (
+            {entries.map((e, i) => (
               <li
                 key={e.id}
                 data-testid="action-trail-entry"
                 data-tool-name={e.toolName}
-                className="relative pl-7 py-1"
+                data-step={i + 1}
+                className="relative pl-8 py-1"
               >
-                {/* Timeline dot. */}
+                {/* Numbered step badge (replaces the plain dot). */}
                 <span
-                  className={`absolute left-[11px] top-2 w-3 h-3 rounded-full border ${
+                  className={`absolute left-[5px] top-[2px] w-[26px] h-[18px] rounded-md text-[10px] font-mono font-semibold flex items-center justify-center border ${
                     e.success
-                      ? "bg-emerald-900/60 border-emerald-700/80"
-                      : "bg-red-900/60 border-red-700/80"
+                      ? "bg-emerald-950/60 border-emerald-800/70 text-emerald-300"
+                      : "bg-red-950/60 border-red-800/70 text-red-300"
                   }`}
                   aria-hidden
-                />
+                >
+                  {i + 1}
+                </span>
                 <div className="flex items-center gap-1.5 text-[11px] mb-0.5">
                   {e.success ? (
                     <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />

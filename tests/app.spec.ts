@@ -38,7 +38,7 @@ test.describe("GHCP UI", () => {
     await page.getByLabel("Toggle sidebar").click();
     await page.getByRole("button", { name: "New Chat", exact: true }).click();
     // Should create session immediately (no dialog) — header badge should show model
-    await expect(page.getByRole("banner").getByText("gpt-5.4")).toBeVisible({ timeout: 15000 });
+    await expect(page.getByRole("banner").getByText("gpt-4o")).toBeVisible({ timeout: 15000 });
   });
 
   test("has settings button that opens settings drawer", async ({ page }) => {
@@ -172,19 +172,19 @@ test.describe("Models API", () => {
     }
   });
 
-  test("new chat uses gpt-5.4 as default model", async ({ page }) => {
+  test("new chat uses gpt-4o as default model", async ({ page }) => {
     await page.goto("/");
     await page.waitForTimeout(2000);
     await page.getByLabel("Toggle sidebar").click();
     await page.getByRole("button", { name: "New Chat", exact: true }).click();
-    // Session should be created with gpt-5.4 — visible in header badge
-    await expect(page.getByRole("banner").getByText("gpt-5.4")).toBeVisible({ timeout: 15000 });
+    // Session should be created with gpt-4o — visible in header badge
+    await expect(page.getByRole("banner").getByText("gpt-4o")).toBeVisible({ timeout: 15000 });
   });
 
-  test("default model is gpt-5.4", async ({ request }) => {
+  test("default model is gpt-4o", async ({ request }) => {
     const res = await request.get("/api/models");
     const data = await res.json();
-    expect(data.default).toBe("gpt-5.4");
+    expect(data.default).toBe("gpt-4o");
   });
 });
 
@@ -416,7 +416,7 @@ test.describe("Work Orders pane", () => {
     // Start a chat so the input bar is enabled
     await page.getByLabel("Toggle sidebar").click();
     await page.getByRole("button", { name: "New Chat", exact: true }).click();
-    await expect(page.getByRole("banner").getByText("gpt-5.4")).toBeVisible({ timeout: 15000 });
+    await expect(page.getByRole("banner").getByText("gpt-4o")).toBeVisible({ timeout: 15000 });
 
     // Click Details on the first order
     const firstRow = page.getByTestId("work-order-row").first();
@@ -435,7 +435,7 @@ test.describe("Work Orders pane", () => {
 
     await page.getByLabel("Toggle sidebar").click();
     await page.getByRole("button", { name: "New Chat", exact: true }).click();
-    await expect(page.getByRole("banner").getByText("gpt-5.4")).toBeVisible({ timeout: 15000 });
+    await expect(page.getByRole("banner").getByText("gpt-4o")).toBeVisible({ timeout: 15000 });
 
     const firstRow = page.getByTestId("work-order-row").first();
     const firstOrderId = await firstRow.getAttribute("data-order-id");
@@ -473,11 +473,65 @@ test.describe("Action Trail pane", () => {
 
     await page.getByLabel("Toggle sidebar").click();
     await page.getByRole("button", { name: "New Chat", exact: true }).click();
-    await expect(page.getByRole("banner").getByText("gpt-5.4")).toBeVisible({ timeout: 15000 });
+    await expect(page.getByRole("banner").getByText("gpt-4o")).toBeVisible({ timeout: 15000 });
 
     // Trail pane still visible and still showing the empty state — no tools
     // have fired yet.
     await expect(page.getByTestId("action-trail-pane")).toBeVisible();
     await expect(page.getByTestId("action-trail-pane")).toContainText("Nothing yet");
+  });
+});
+
+test.describe("Pane toggles", () => {
+  test("work orders pane can be hidden and re-shown from the header", async ({ page }) => {
+    await page.setViewportSize({ width: 1400, height: 900 });
+    await page.goto("/");
+    // Pane is open by default.
+    await expect(page.getByTestId("work-orders-pane")).toBeVisible({ timeout: 10000 });
+    const toggle = page.getByTestId("toggle-work-orders");
+    await expect(toggle).toBeVisible();
+
+    // Click to hide.
+    await toggle.click();
+    await expect(page.getByTestId("work-orders-pane")).toBeHidden();
+
+    // Click again to show.
+    await toggle.click();
+    await expect(page.getByTestId("work-orders-pane")).toBeVisible();
+  });
+
+  test("action trail pane can be hidden and re-shown from the header", async ({ page }) => {
+    await page.setViewportSize({ width: 1400, height: 900 });
+    await page.goto("/");
+    await expect(page.getByTestId("action-trail-pane")).toBeVisible({ timeout: 10000 });
+    const toggle = page.getByTestId("toggle-action-trail");
+    await expect(toggle).toBeVisible();
+
+    await toggle.click();
+    await expect(page.getByTestId("action-trail-pane")).toBeHidden();
+
+    await toggle.click();
+    await expect(page.getByTestId("action-trail-pane")).toBeVisible();
+  });
+
+  test("pane visibility preference survives a page reload", async ({ page }) => {
+    await page.setViewportSize({ width: 1400, height: 900 });
+    await page.goto("/");
+    await expect(page.getByTestId("work-orders-pane")).toBeVisible({ timeout: 10000 });
+
+    // Hide both panes.
+    await page.getByTestId("toggle-work-orders").click();
+    await page.getByTestId("toggle-action-trail").click();
+    await expect(page.getByTestId("work-orders-pane")).toBeHidden();
+    await expect(page.getByTestId("action-trail-pane")).toBeHidden();
+
+    // Reload — both should still be hidden.
+    await page.reload();
+    await expect(page.getByTestId("work-orders-pane")).toBeHidden({ timeout: 10000 });
+    await expect(page.getByTestId("action-trail-pane")).toBeHidden();
+
+    // Restore for any subsequent tests in the same browser context.
+    await page.getByTestId("toggle-work-orders").click();
+    await page.getByTestId("toggle-action-trail").click();
   });
 });

@@ -20,6 +20,8 @@ interface WorkOrdersPaneProps {
   /** Called when the user clicks an action button. The pane only prefills the
    * input bar — sending stays in the user's hands. */
   onPrefillPrompt: (prompt: string) => void;
+  /** When false, the pane is not rendered at all (header toggle hides it). */
+  isOpen: boolean;
 }
 
 const READY_BADGE: Record<string, string> = {
@@ -33,7 +35,7 @@ function readyBadgeClass(status: string): string {
   return READY_BADGE[key] ?? READY_BADGE.unknown;
 }
 
-export function WorkOrdersPane({ onPrefillPrompt }: WorkOrdersPaneProps) {
+export function WorkOrdersPane({ onPrefillPrompt, isOpen }: WorkOrdersPaneProps) {
   const [orders, setOrders] = useState<WorkOrder[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -75,7 +77,11 @@ export function WorkOrdersPane({ onPrefillPrompt }: WorkOrdersPaneProps) {
   return (
     <aside
       data-testid="work-orders-pane"
-      className="hidden sm:flex w-60 md:w-64 lg:w-72 xl:w-80 shrink-0 flex-col border-r border-zinc-800 bg-zinc-950/60"
+      hidden={!isOpen}
+      className={
+        (isOpen ? "hidden sm:flex" : "hidden") +
+        " w-60 md:w-64 lg:w-72 xl:w-80 shrink-0 flex-col border-r border-zinc-800 bg-zinc-950/60"
+      }
     >
       <header className="flex items-center justify-between px-3 py-2 border-b border-zinc-800 shrink-0">
         <div className="flex items-center gap-2 text-zinc-300">
