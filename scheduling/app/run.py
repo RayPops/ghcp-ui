@@ -154,6 +154,13 @@ def main(argv: list[str] | None = None) -> int:
         default="data/bt_real_data/delay_data.csv",
         help="Optional Skill E delay history CSV used by --clean.",
     )
+    parser.add_argument(
+        "--export-payloads",
+        action="store_true",
+        help="Render every order in --csv to a PSO XML payload file under "
+             "<out>/payloads/. Frozen Input_Reference id and timestamp so "
+             "snapshots diff cleanly between runs.",
+    )
 
     args = parser.parse_args(argv)
 
@@ -166,6 +173,18 @@ def main(argv: list[str] | None = None) -> int:
     logger = logging.getLogger("scheduling-copilot")
 
     csv_path = Path(args.csv)
+
+    # Export PSO XML payloads for every order (no network, no PSO call).
+    if args.export_payloads:
+        from app.export_payloads import export_payloads
+
+        try:
+            count, out_dir = export_payloads(csv_path, Path(args.out) / "pso_payloads")
+        except FileNotFoundError as exc:
+            logger.error(str(exc))
+            return 1
+        print(f"Wrote {count} PSO XML payloads to {out_dir}")
+        return 0
 
     # Generate the raw CSV (pre-demo step).
     if args.generate_raw:

@@ -39,23 +39,39 @@ mcp = FastMCP(
     port=_mcp_port,
 )
 
-# Cache loaded work orders
+# Cache loaded work orders. Invalidated when the CSV file's mtime changes so
+# editing the CSV does not require restarting the MCP server (a footgun we
+# hit during the BT demo prep when dispersed postcodes did not appear).
 _orders_cache: dict[str, WorkOrder] = {}
+_orders_cache_mtime: float | None = None
 _csv_path = os.environ.get("SCHEDULING_CSV_PATH", "data/work_orders.csv")
 _delay_csv_path = os.environ.get("DELAY_CSV_PATH", "data/bt_real_data/delay_data.csv")
 
 
 def _ensure_loaded() -> dict[str, WorkOrder]:
-    """Load work orders on first access."""
-    if not _orders_cache:
-        path = Path(_csv_path)
-        if not path.is_absolute():
-            # Resolve relative to the scheduling directory
-            scheduling_dir = Path(__file__).parent.parent
-            path = scheduling_dir / path
-        orders = load_work_orders(path)
-        for o in orders:
-            _orders_cache[o.order_id] = o
+    """Return the cached work orders, reloading if the CSV file has changed."""
+    global _orders_cache_mtime
+
+    path = Path(_csv_path)
+    if not path.is_absolute():
+        # Resolve relative to the scheduling directory
+        scheduling_dir = Path(__file__).parent.parent
+        path = scheduling_dir / path
+
+    try:
+        current_mtime = path.stat().st_mtime
+    except OSError:
+        # File missing; let load_work_orders raise a clearer error below.
+        current_mtime = None
+
+    if _orders_cache and _orders_cache_mtime == current_mtime:
+        return _orders_cache
+
+    _orders_cache.clear()
+    orders = load_work_orders(path)
+    for o in orders:
+        _orders_cache[o.order_id] = o
+    _orders_cache_mtime = current_mtime
     return _orders_cache
 
 

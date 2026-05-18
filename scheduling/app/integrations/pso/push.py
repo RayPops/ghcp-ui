@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import logging
 from dataclasses import asdict, dataclass
+from datetime import date
 from pathlib import Path
 from typing import Optional
 
@@ -63,6 +64,7 @@ def push_order_to_pso(
     order: Optional[WorkOrder] = None,
     geocoder: Optional[Geocoder] = None,
     client: Optional[PsoClient] = None,
+    today: Optional[date] = None,
 ) -> PsoPushResult:
     """Run the full push pipeline for a single order.
 
@@ -82,6 +84,9 @@ def push_order_to_pso(
         :class:`PgeocodeGeocoder`.
     client:
         Optional :class:`PsoClient`. Defaults to one built from env vars.
+    today:
+        Override "today" for the SLA guardrail. Defaults to
+        :func:`datetime.date.today`.
     """
     # 1. Order
     if order is None:
@@ -108,7 +113,7 @@ def push_order_to_pso(
         )
 
     # 4. Translate to XML
-    inputs = build_pso_inputs(decision, order, coordinates)
+    inputs = build_pso_inputs(decision, order, coordinates, today=today)
     xml_body = render_add_tasks_xml(inputs)
 
     # 5. POST

@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass, field
+from datetime import date
 from typing import Any, Optional
 
 from app.models import (
@@ -18,6 +19,7 @@ from app.models import (
     SchedulingDecision,
     WorkOrder,
 )
+from app.sla_guardrail import GUARDRAIL_REASON, apply_sla_guardrail
 
 # 17-column header order matching ``data/work_orders.csv`` exactly.
 CLEANED_COLUMNS = (
@@ -57,6 +59,10 @@ class ActionEntry:
     For directly extracted values, ``source_excerpt`` is a verbatim copy of
     the note substring that triggered the rule. For derived values, it is
     intentionally empty and ``reasoning`` describes the rule.
+
+    ``extra`` carries entry-type-specific metadata that does not fit the
+    standard skill-extraction shape - e.g. the ``sla_guardrail_applied``
+    entry uses it to record both the original and shifted committed dates.
     """
 
     field: str
@@ -65,6 +71,7 @@ class ActionEntry:
     reasoning: str
     source_excerpt: str = ""
     pattern: Optional[str] = None  # rule / regex name when relevant
+    extra: Optional[dict[str, Any]] = None  # entry-type-specific payload
 
     def to_dict(self) -> dict[str, Any]:
         out: dict[str, Any] = {
@@ -76,6 +83,8 @@ class ActionEntry:
         }
         if self.pattern:
             out["pattern"] = self.pattern
+        if self.extra:
+            out.update(self.extra)
         return out
 
 
@@ -408,9 +417,36 @@ def aggregate(
     order: WorkOrder,
     decision: SchedulingDecision,
     delays: Optional[DelayHistory] = None,
+    today: Optional[date] = None,
 ) -> AggregatedOrder:
     """Combine the original raw row + the decision + optional delay lookup
-    into a cleaned-CSV row plus an action-log entry."""
+    into a cleaned-CSV row plus an action-log entry.
+
+    ``today`` controls the SLA guardrail (see ``app.sla_guardrail``). If a
+    work order's ``committed_delivery_date`` is strictly before ``today`` we
+    write the shifted date into the cleaned row and emit a dedicated
+    ``sla_guardrail_applied`` action entry that preserves the original date
+    for audit. Defaults to :func:`datetime.date.today` for production use;
+    pin it from tests for determinism.
+    """
+    if today is None:
+        today = date.today()
+
+    # SLA guardrail: never let a past committed date flow downstream.
+    guardrail = apply_sla_guardrail(order.committed_delivery_date, today)
+    sla_entries: list[ActionEntry] = []
+    if guardrail.shifted:
+        sla_entries.append(ActionEntry(
+            field="sla_guardrail_applied",
+            value=guardrail.effective_date.isoformat(),
+            skill="SLA Guardrail",
+            reasoning=GUARDRAIL_REASON,
+            extra={
+                "original_committed_date": guardrail.original_date.isoformat(),
+                "shifted_committed_date": guardrail.effective_date.isoformat(),
+                "reason": GUARDRAIL_REASON,
+            },
+        ))
 
     # Per-column recoveries
     dog, dog_entries = _recover_dog_on_site(decision)
@@ -422,6 +458,8 @@ def aggregate(
 
     # Build the 17-column cleaned row. For columns the raw CSV preserves
     # untouched (postcode, dates, photo flag, etc.) we copy from the order.
+    # ``committed_delivery_date`` carries the shifted value when the
+    # guardrail fired; the original is preserved in the action log entry.
     cleaned_row: dict[str, str] = {
         "order_id": order.order_id,
         "order_source": order.order_source,
@@ -429,7 +467,7 @@ def aggregate(
         "job_type": order.job_type,
         "requested_start_date": order.requested_start_date.isoformat(),
         "requested_end_date": order.requested_end_date.isoformat(),
-        "committed_delivery_date": order.committed_delivery_date.isoformat(),
+        "committed_delivery_date": guardrail.effective_date.isoformat(),
         "postcode": order.postcode,
         "customer_ready_status": ready,
         "access_issue_flag": _bool_str(access),
@@ -442,7 +480,8 @@ def aggregate(
         "unstructured_customer_notes": order.unstructured_customer_notes,
     }
 
-    # Action log = direct extractions (from traces) + recovery entries.
+    # Action log = direct extractions (from traces) + recovery entries +
+    # the SLA guardrail entry (when it fired).
     extractions: list[ActionEntry] = []
     extractions.extend(_extractions_from_traces(decision))
     extractions.extend(dog_entries)
@@ -451,6 +490,7 @@ def aggregate(
     extractions.extend(access_entries)
     extractions.extend(ready_entries)
     extractions.extend(delay_entries)
+    extractions.extend(sla_entries)
 
     # Decision summary
     decision_label = (decision.recommended_action or "").upper().replace("_", "-") or "UNKNOWN"

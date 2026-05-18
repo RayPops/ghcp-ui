@@ -1,315 +1,336 @@
-<mxfile host="app.diagrams.net" modified="2026-03-31T00:00:00.000Z" agent="GitHub Copilot" version="21.0.0" type="device">
-  <diagram id="scheduling-architecture" name="System Architecture">
-    <mxGraphModel dx="1422" dy="762" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+<mxfile host="app.diagrams.net" modified="2026-04-30T00:00:00.000Z" agent="GitHub Copilot" version="21.0.0" type="device">
+  <diagram id="system-arch" name="System Architecture">
+    <mxGraphModel dx="1450" dy="920" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1450" pageHeight="820" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
 
-        <!-- Title -->
-        <mxCell id="title" value="BT Openreach Scheduling Copilot - System Architecture" style="text;html=1;fontSize=20;fontStyle=1;align=center;verticalAlign=middle;whiteSpace=wrap;" vertex="1" parent="1">
-          <mxGeometry x="200" y="20" width="760" height="40" as="geometry" />
+        <!-- ==================== TITLE ==================== -->
+        <mxCell id="title" value="BT Openreach Scheduling Copilot" style="text;html=1;fontSize=22;fontStyle=1;align=center;verticalAlign=middle;fontColor=#333333;" vertex="1" parent="1">
+          <mxGeometry x="350" y="15" width="500" height="35" as="geometry" />
         </mxCell>
 
-        <!-- User Layer -->
-        <mxCell id="user-group" value="User Layer" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;verticalAlign=top;fontStyle=1;fontSize=13;arcSize=8;" vertex="1" parent="1">
-          <mxGeometry x="40" y="80" width="280" height="220" as="geometry" />
-        </mxCell>
-        <mxCell id="browser" value="&lt;b&gt;Browser&lt;/b&gt;&lt;br&gt;React 19 + Vite&lt;br&gt;Chat UI with&lt;br&gt;ToolProgress indicators" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#6c8ebf;fontSize=11;" vertex="1" parent="1">
-          <mxGeometry x="60" y="120" width="160" height="70" as="geometry" />
-        </mxCell>
-        <mxCell id="cli" value="&lt;b&gt;CLI&lt;/b&gt;&lt;br&gt;python -m app.run&lt;br&gt;Batch processing" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#6c8ebf;fontSize=11;" vertex="1" parent="1">
-          <mxGeometry x="60" y="210" width="160" height="70" as="geometry" />
+        <!-- ==================== ROW 1: CHAT PATH (left to right) ==================== -->
+
+        <!-- Browser -->
+        <mxCell id="browser" value="&lt;b style=&quot;font-size:13px&quot;&gt;Browser&lt;/b&gt;&lt;br&gt;&lt;br&gt;React 19 + Vite&lt;br&gt;Chat input&lt;br&gt;Tool progress spinners&lt;br&gt;Streamed responses" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;verticalAlign=middle;spacingTop=0;arcSize=10;" vertex="1" parent="1">
+          <mxGeometry x="40" y="80" width="190" height="130" as="geometry" />
         </mxCell>
 
-        <!-- ghcp-ui Server -->
-        <mxCell id="server-group" value="ghcp-ui Server" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;verticalAlign=top;fontStyle=1;fontSize=13;arcSize=8;" vertex="1" parent="1">
-          <mxGeometry x="380" y="80" width="220" height="220" as="geometry" />
-        </mxCell>
-        <mxCell id="express" value="&lt;b&gt;Express 5&lt;/b&gt;&lt;br&gt;Port 3001" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#82b366;fontSize=11;" vertex="1" parent="1">
-          <mxGeometry x="400" y="120" width="180" height="50" as="geometry" />
-        </mxCell>
-        <mxCell id="copilot-sdk" value="&lt;b&gt;Copilot SDK&lt;/b&gt;&lt;br&gt;@github/copilot-sdk&lt;br&gt;LLM Orchestration" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#82b366;fontSize=11;" vertex="1" parent="1">
-          <mxGeometry x="400" y="185" width="180" height="55" as="geometry" />
-        </mxCell>
-        <mxCell id="ai-foundry" value="&lt;b&gt;Azure AI Foundry&lt;/b&gt;&lt;br&gt;GPT model (BYOK)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11;" vertex="1" parent="1">
-          <mxGeometry x="400" y="255" width="180" height="35" as="geometry" />
+        <!-- Express + Copilot SDK -->
+        <mxCell id="server" value="&lt;b style=&quot;font-size:13px&quot;&gt;ghcp-ui Server&lt;/b&gt;&lt;br&gt;&lt;br&gt;Express 5 (port 3001)&lt;br&gt;Copilot SDK&lt;br&gt;LLM orchestration&lt;br&gt;&lt;i&gt;Decides which tools to call&lt;/i&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;verticalAlign=middle;arcSize=10;" vertex="1" parent="1">
+          <mxGeometry x="340" y="80" width="210" height="130" as="geometry" />
         </mxCell>
 
         <!-- MCP Server -->
-        <mxCell id="mcp-group" value="Python MCP Server" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;verticalAlign=top;fontStyle=1;fontSize=13;arcSize=8;" vertex="1" parent="1">
-          <mxGeometry x="660" y="80" width="240" height="300" as="geometry" />
-        </mxCell>
-        <mxCell id="mcp-transport" value="&lt;b&gt;SSE Transport&lt;/b&gt;&lt;br&gt;Port 3002" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#9673a6;fontSize=11;" vertex="1" parent="1">
-          <mxGeometry x="680" y="120" width="200" height="40" as="geometry" />
+        <mxCell id="mcp" value="&lt;b style=&quot;font-size:13px&quot;&gt;MCP Server&lt;/b&gt;&lt;br&gt;&lt;br&gt;Python (port 3002)&lt;br&gt;SSE transport&lt;br&gt;8 tools registered&lt;br&gt;&lt;i&gt;Bridges LLM to domain skills&lt;/i&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=11;verticalAlign=middle;arcSize=10;" vertex="1" parent="1">
+          <mxGeometry x="660" y="80" width="210" height="130" as="geometry" />
         </mxCell>
 
-        <!-- MCP Tools -->
-        <mxCell id="tool-list" value="&lt;b&gt;list_work_orders&lt;/b&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#9673a6;fontSize=10;align=left;spacingLeft=8;" vertex="1" parent="1">
-          <mxGeometry x="680" y="170" width="200" height="22" as="geometry" />
-        </mxCell>
-        <mxCell id="tool-get" value="&lt;b&gt;get_work_order&lt;/b&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#9673a6;fontSize=10;align=left;spacingLeft=8;" vertex="1" parent="1">
-          <mxGeometry x="680" y="192" width="200" height="22" as="geometry" />
-        </mxCell>
-        <mxCell id="tool-extract" value="&lt;b&gt;extract_constraints&lt;/b&gt;  (Skill A)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=10;align=left;spacingLeft=8;" vertex="1" parent="1">
-          <mxGeometry x="680" y="224" width="200" height="22" as="geometry" />
-        </mxCell>
-        <mxCell id="tool-date" value="&lt;b&gt;assess_date_risk&lt;/b&gt;  (Skill B)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=10;align=left;spacingLeft=8;" vertex="1" parent="1">
-          <mxGeometry x="680" y="246" width="200" height="22" as="geometry" />
-        </mxCell>
-        <mxCell id="tool-readiness" value="&lt;b&gt;assess_readiness&lt;/b&gt;  (Skill C)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=10;align=left;spacingLeft=8;" vertex="1" parent="1">
-          <mxGeometry x="680" y="268" width="200" height="22" as="geometry" />
-        </mxCell>
-        <mxCell id="tool-safety" value="&lt;b&gt;assess_safety&lt;/b&gt;  (Skill D)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=10;align=left;spacingLeft=8;" vertex="1" parent="1">
-          <mxGeometry x="680" y="290" width="200" height="22" as="geometry" />
-        </mxCell>
-        <mxCell id="tool-compose" value="&lt;b&gt;compose_scheduling_decision&lt;/b&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=10;align=left;spacingLeft=8;" vertex="1" parent="1">
-          <mxGeometry x="680" y="312" width="200" height="22" as="geometry" />
+        <!-- Azure AI Foundry -->
+        <mxCell id="azure" value="&lt;b&gt;Azure AI Foundry&lt;/b&gt;&lt;br&gt;GPT-4.1 (BYOK)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11;arcSize=10;" vertex="1" parent="1">
+          <mxGeometry x="370" y="240" width="150" height="45" as="geometry" />
         </mxCell>
 
-        <!-- Domain Skills -->
-        <mxCell id="skills-group" value="Domain Skills (Pure Python)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;verticalAlign=top;fontStyle=1;fontSize=13;arcSize=8;" vertex="1" parent="1">
-          <mxGeometry x="380" y="420" width="520" height="150" as="geometry" />
-        </mxCell>
-        <mxCell id="skill-a" value="&lt;b&gt;Extract Scheduling&lt;br&gt;Constraints&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:9px&quot;&gt;Regex + keyword&lt;br&gt;extraction from notes&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#d79b00;fontSize=10;" vertex="1" parent="1">
-          <mxGeometry x="395" y="460" width="115" height="85" as="geometry" />
-        </mxCell>
-        <mxCell id="skill-b" value="&lt;b&gt;Assess Delivery&lt;br&gt;Date Risk&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:9px&quot;&gt;Ethernet vs Broadband&lt;br&gt;delay rules&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#d79b00;fontSize=10;" vertex="1" parent="1">
-          <mxGeometry x="520" y="460" width="115" height="85" as="geometry" />
-        </mxCell>
-        <mxCell id="skill-c" value="&lt;b&gt;Assess Visit&lt;br&gt;Readiness&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:9px&quot;&gt;Tools, materials,&lt;br&gt;duration lookup&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#d79b00;fontSize=10;" vertex="1" parent="1">
-          <mxGeometry x="645" y="460" width="115" height="85" as="geometry" />
-        </mxCell>
-        <mxCell id="skill-d" value="&lt;b&gt;Assess Safety&lt;br&gt;&amp;amp; Feasibility&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:9px&quot;&gt;PPE, dog, confined&lt;br&gt;space detection&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#d79b00;fontSize=10;" vertex="1" parent="1">
-          <mxGeometry x="770" y="460" width="115" height="85" as="geometry" />
-        </mxCell>
+        <!-- ==================== ROW 1 ARROWS ==================== -->
 
-        <!-- Data -->
-        <mxCell id="csv" value="&lt;b&gt;work_orders.csv&lt;/b&gt;&lt;br&gt;14 synthetic rows&lt;br&gt;Messy notes, mixed types" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=12;fillColor=#f8cecc;strokeColor=#b85450;fontSize=11;" vertex="1" parent="1">
-          <mxGeometry x="60" y="440" width="170" height="80" as="geometry" />
-        </mxCell>
-
-        <!-- Output -->
-        <mxCell id="output" value="&lt;b&gt;out/&lt;/b&gt;&lt;br&gt;*.json + *.md&lt;br&gt;decisions.json" style="shape=document;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=14;fillColor=#f8cecc;strokeColor=#b85450;fontSize=11;" vertex="1" parent="1">
-          <mxGeometry x="60" y="560" width="170" height="70" as="geometry" />
-        </mxCell>
-
-        <!-- SKILL.md packages -->
-        <mxCell id="skillmd-group" value=".github/skills/ (SKILL.md Packages)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;verticalAlign=top;fontStyle=1;fontSize=11;arcSize=12;" vertex="1" parent="1">
-          <mxGeometry x="380" y="600" width="520" height="70" as="geometry" />
-        </mxCell>
-        <mxCell id="skillmd-list" value="extract-scheduling-constraints/SKILL.md  |  assess-delivery-date-risk/SKILL.md  |  assess-visit-readiness/SKILL.md  |  assess-safety-and-feasibility/SKILL.md" style="text;html=1;fontSize=9;align=center;verticalAlign=middle;whiteSpace=wrap;" vertex="1" parent="1">
-          <mxGeometry x="390" y="625" width="500" height="35" as="geometry" />
-        </mxCell>
-
-        <!-- Arrows: Browser to Express -->
-        <mxCell id="arrow-browser-express" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeWidth=2;strokeColor=#6c8ebf;" edge="1" parent="1" source="browser" target="express">
+        <!-- Browser -> Server -->
+        <mxCell id="a1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeWidth=2;strokeColor=#333333;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="browser" target="server">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="arrow-browser-express-label" value="Chat API&lt;br&gt;(SSE stream)" style="edgeLabel;html=1;fontSize=9;" vertex="1" connectable="0" parent="arrow-browser-express">
-          <mxGeometry x="-0.1" relative="1" as="geometry">
-            <mxPoint as="offset" />
-          </mxGeometry>
-        </mxCell>
-
-        <!-- Arrow: Express to Copilot SDK -->
-        <mxCell id="arrow-express-sdk" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeWidth=2;strokeColor=#82b366;" edge="1" parent="1" source="express" target="copilot-sdk">
+        <mxCell id="a1-label" value="Chat API (SSE)" style="edgeLabel;html=1;fontSize=10;fontColor=#333333;" vertex="1" connectable="0" parent="a1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
 
-        <!-- Arrow: Copilot SDK to MCP -->
-        <mxCell id="arrow-sdk-mcp" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeWidth=2;strokeColor=#9673a6;" edge="1" parent="1" source="copilot-sdk" target="mcp-transport">
+        <!-- Server -> MCP -->
+        <mxCell id="a2" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeWidth=2;strokeColor=#333333;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="server" target="mcp">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="arrow-sdk-mcp-label" value="MCP tool calls&lt;br&gt;(SSE transport)" style="edgeLabel;html=1;fontSize=9;" vertex="1" connectable="0" parent="arrow-sdk-mcp">
-          <mxGeometry x="-0.1" relative="1" as="geometry">
-            <mxPoint as="offset" />
-          </mxGeometry>
-        </mxCell>
-
-        <!-- Arrow: MCP to Skills -->
-        <mxCell id="arrow-mcp-skills" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeWidth=2;strokeColor=#d79b00;" edge="1" parent="1" source="tool-compose" target="skills-group">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="arrow-mcp-skills-label" value="Python function calls" style="edgeLabel;html=1;fontSize=9;" vertex="1" connectable="0" parent="arrow-mcp-skills">
-          <mxGeometry x="-0.1" relative="1" as="geometry">
-            <mxPoint as="offset" />
-          </mxGeometry>
-        </mxCell>
-
-        <!-- Arrow: Skills to CSV -->
-        <mxCell id="arrow-skills-csv" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeWidth=2;strokeColor=#b85450;dashed=1;" edge="1" parent="1" source="skills-group" target="csv">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="arrow-skills-csv-label" value="CSV load" style="edgeLabel;html=1;fontSize=9;" vertex="1" connectable="0" parent="arrow-skills-csv">
-          <mxGeometry x="-0.1" relative="1" as="geometry">
-            <mxPoint as="offset" />
-          </mxGeometry>
-        </mxCell>
-
-        <!-- Arrow: CLI to Skills -->
-        <mxCell id="arrow-cli-skills" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeWidth=2;strokeColor=#d79b00;dashed=1;" edge="1" parent="1" source="cli" target="skills-group">
-          <mxGeometry relative="1" as="geometry">
-            <Array as="points">
-              <mxPoint x="140" y="380" />
-              <mxPoint x="640" y="380" />
-            </Array>
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="arrow-cli-skills-label" value="Direct Python calls (batch mode)" style="edgeLabel;html=1;fontSize=9;" vertex="1" connectable="0" parent="arrow-cli-skills">
-          <mxGeometry x="-0.1" relative="1" as="geometry">
-            <mxPoint as="offset" />
-          </mxGeometry>
-        </mxCell>
-
-        <!-- Arrow: CLI to Output -->
-        <mxCell id="arrow-cli-output" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeWidth=2;strokeColor=#b85450;dashed=1;" edge="1" parent="1" source="cli" target="output">
-          <mxGeometry relative="1" as="geometry">
-            <Array as="points">
-              <mxPoint x="40" y="280" />
-              <mxPoint x="40" y="595" />
-            </Array>
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="arrow-cli-output-label" value="JSON + MD files" style="edgeLabel;html=1;fontSize=9;" vertex="1" connectable="0" parent="arrow-cli-output">
-          <mxGeometry x="-0.1" relative="1" as="geometry">
-            <mxPoint as="offset" />
-          </mxGeometry>
-        </mxCell>
-
-        <!-- Arrow: SDK to AI Foundry -->
-        <mxCell id="arrow-sdk-ai" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeWidth=1;strokeColor=#d6b656;dashed=1;" edge="1" parent="1" source="copilot-sdk" target="ai-foundry">
+        <mxCell id="a2-label" value="MCP tool calls (SSE)" style="edgeLabel;html=1;fontSize=10;fontColor=#333333;" vertex="1" connectable="0" parent="a2">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
 
-        <!-- Legend -->
-        <mxCell id="legend" value="&lt;b&gt;Legend&lt;/b&gt;&lt;br&gt;Solid lines = runtime data flow&lt;br&gt;Dashed lines = batch/file I/O&lt;br&gt;Orange = domain skill layer" style="text;html=1;fontSize=10;align=left;verticalAlign=top;whiteSpace=wrap;fillColor=#f5f5f5;strokeColor=#666666;rounded=1;" vertex="1" parent="1">
-          <mxGeometry x="40" y="340" width="200" height="70" as="geometry" />
+        <!-- Server -> Azure (down) -->
+        <mxCell id="a3" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeWidth=1;strokeColor=#d6b656;dashed=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="server" target="azure">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="a3-label" value="LLM API" style="edgeLabel;html=1;fontSize=9;fontColor=#999999;" vertex="1" connectable="0" parent="a3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- ==================== ROW 2: DOMAIN SKILLS ==================== -->
+
+        <mxCell id="skills-label" value="Domain Skills (Pure Python -- deterministic, no LLM)" style="text;html=1;fontSize=12;fontStyle=5;align=left;verticalAlign=middle;fontColor=#7f6000;" vertex="1" parent="1">
+          <mxGeometry x="40" y="310" width="400" height="25" as="geometry" />
+        </mxCell>
+
+        <!-- Skill A -->
+        <mxCell id="skill-a" value="&lt;b&gt;A: Extract Constraints&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px;color:#666&quot;&gt;Regex parses messy notes&lt;br&gt;into dates, windows,&lt;br&gt;and instructions&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=11;arcSize=10;" vertex="1" parent="1">
+          <mxGeometry x="40" y="345" width="160" height="80" as="geometry" />
+        </mxCell>
+
+        <!-- Skill B -->
+        <mxCell id="skill-b" value="&lt;b&gt;B: Assess Date Risk&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px;color:#666&quot;&gt;Ethernet: 10-day window&lt;br&gt;Broadband: 3-day window&lt;br&gt;Recommends date change&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=11;arcSize=10;" vertex="1" parent="1">
+          <mxGeometry x="220" y="345" width="160" height="80" as="geometry" />
+        </mxCell>
+
+        <!-- Skill C -->
+        <mxCell id="skill-c" value="&lt;b&gt;C: Assess Readiness&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px;color:#666&quot;&gt;Tools, materials, duration&lt;br&gt;Based on job type and&lt;br&gt;site conditions&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=11;arcSize=10;" vertex="1" parent="1">
+          <mxGeometry x="400" y="345" width="160" height="80" as="geometry" />
+        </mxCell>
+
+        <!-- Skill D -->
+        <mxCell id="skill-d" value="&lt;b&gt;D: Assess Safety&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px;color:#666&quot;&gt;Dog, confined space,&lt;br&gt;asbestos, overhead work&lt;br&gt;PPE and extra engineer&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=11;arcSize=10;" vertex="1" parent="1">
+          <mxGeometry x="580" y="345" width="160" height="80" as="geometry" />
+        </mxCell>
+
+        <!-- Skill E (NEW) -->
+        <mxCell id="skill-e" value="&lt;b&gt;E: Delay History&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px;color:#666&quot;&gt;709K real delay records&lt;br&gt;Wayleave, access, civils&lt;br&gt;Ongoing vs resolved&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e6d0de;strokeColor=#996185;fontSize=11;arcSize=10;" vertex="1" parent="1">
+          <mxGeometry x="760" y="345" width="160" height="80" as="geometry" />
+        </mxCell>
+
+        <!-- MCP -> Skills (single arrow to center skill bar) -->
+        <mxCell id="a4" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeWidth=2;strokeColor=#9673a6;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="mcp" target="skill-c">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="a4-label" value="Python function calls" style="edgeLabel;html=1;fontSize=10;fontColor=#9673a6;" vertex="1" connectable="0" parent="a4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Horizontal connector bar linking all 5 skills at their top edge -->
+        <mxCell id="skill-bar" value="" style="shape=line;strokeWidth=2;strokeColor=#d79b00;fillColor=none;align=center;verticalAlign=middle;spacingTop=-1;spacingLeft=0;spacingRight=0;rotatable=0;labelPosition=center;verticalLabelPosition=bottom;portConstraint=eastwest;" vertex="1" parent="1">
+          <mxGeometry x="120" y="340" width="720" height="10" as="geometry" />
+        </mxCell>
+
+        <!-- ==================== ROW 3: DATA SOURCES ==================== -->
+
+        <!-- CSV data source -->
+        <mxCell id="csv" value="&lt;b&gt;work_orders.csv&lt;/b&gt;&lt;br&gt;12 real BT orders&lt;br&gt;&lt;font style=&quot;font-size:9px;color:#666&quot;&gt;Curated from notes-ults-*.csv&lt;/font&gt;" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=10;fillColor=#f8cecc;strokeColor=#b85450;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="200" y="480" width="180" height="75" as="geometry" />
+        </mxCell>
+
+        <!-- Delay data source (NEW) -->
+        <mxCell id="delay-csv" value="&lt;b&gt;delay_data.csv&lt;/b&gt;&lt;br&gt;709K delay records&lt;br&gt;&lt;font style=&quot;font-size:9px;color:#666&quot;&gt;Real BT Openreach data (78 MB)&lt;/font&gt;" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=10;fillColor=#e6d0de;strokeColor=#996185;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="440" y="480" width="180" height="75" as="geometry" />
+        </mxCell>
+
+        <!-- Output files -->
+        <mxCell id="output" value="&lt;b&gt;out/&lt;/b&gt;&lt;br&gt;{order}.json, {order}.md&lt;br&gt;decisions.json" style="shape=document;whiteSpace=wrap;html=1;size=12;fillColor=#f5f5f5;strokeColor=#666666;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="680" y="485" width="180" height="65" as="geometry" />
+        </mxCell>
+
+        <!-- Skills A-D -> CSV -->
+        <mxCell id="a5" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeWidth=1;strokeColor=#b85450;dashed=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="skill-b" target="csv">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="a5-label" value="reads" style="edgeLabel;html=1;fontSize=9;fontColor=#999999;" vertex="1" connectable="0" parent="a5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Skill E -> delay_data.csv -->
+        <mxCell id="a5b" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeWidth=1;strokeColor=#996185;dashed=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="skill-e" target="delay-csv">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="a5b-label" value="reads" style="edgeLabel;html=1;fontSize=9;fontColor=#999999;" vertex="1" connectable="0" parent="a5b">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Skills -> Output (CLI path) -->
+        <mxCell id="a6" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeWidth=1;strokeColor=#666666;dashed=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="skill-c" target="output">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="a6-label" value="writes (CLI)" style="edgeLabel;html=1;fontSize=9;fontColor=#999999;" vertex="1" connectable="0" parent="a6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- ==================== CLI (bottom left) ==================== -->
+
+        <mxCell id="cli" value="&lt;b&gt;CLI&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px;color:#666&quot;&gt;python -m app.run&lt;br&gt;Batch processing&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;arcSize=10;" vertex="1" parent="1">
+          <mxGeometry x="40" y="490" width="120" height="55" as="geometry" />
+        </mxCell>
+
+        <!-- CLI -> Skills -->
+        <mxCell id="a7" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeWidth=2;strokeColor=#6c8ebf;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="cli" target="skill-a">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="a7-label" value="Direct calls" style="edgeLabel;html=1;fontSize=9;fontColor=#6c8ebf;" vertex="1" connectable="0" parent="a7">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- ==================== LEGEND (right side) ==================== -->
+
+        <mxCell id="legend-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fafafa;strokeColor=#cccccc;arcSize=10;" vertex="1" parent="1">
+          <mxGeometry x="960" y="80" width="240" height="195" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-title" value="&lt;b&gt;Two paths, same skills&lt;/b&gt;" style="text;html=1;fontSize=12;fontStyle=0;align=center;verticalAlign=middle;fontColor=#333333;" vertex="1" parent="1">
+          <mxGeometry x="970" y="85" width="220" height="25" as="geometry" />
+        </mxCell>
+
+        <mxCell id="leg-chat-dot" value="" style="ellipse;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="975" y="120" width="14" height="14" as="geometry" />
+        </mxCell>
+        <mxCell id="leg-chat-text" value="&lt;b&gt;Chat UI path&lt;/b&gt;&lt;br&gt;User asks question in browser.&lt;br&gt;LLM decides which tools to call.&lt;br&gt;Results streamed back to chat." style="text;html=1;fontSize=10;align=left;verticalAlign=top;fontColor=#333333;" vertex="1" parent="1">
+          <mxGeometry x="995" y="115" width="195" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="leg-cli-dot" value="" style="ellipse;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="975" y="190" width="14" height="14" as="geometry" />
+        </mxCell>
+        <mxCell id="leg-cli-text" value="&lt;b&gt;CLI path&lt;/b&gt;&lt;br&gt;Batch processes all orders.&lt;br&gt;Calls skills directly (no LLM).&lt;br&gt;Writes JSON + Markdown to out/." style="text;html=1;fontSize=10;align=left;verticalAlign=top;fontColor=#333333;" vertex="1" parent="1">
+          <mxGeometry x="995" y="185" width="195" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- ==================== MCP TOOLS REFERENCE (right side) ==================== -->
+
+        <mxCell id="tools-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fafafa;strokeColor=#cccccc;arcSize=10;" vertex="1" parent="1">
+          <mxGeometry x="960" y="310" width="240" height="270" as="geometry" />
+        </mxCell>
+        <mxCell id="tools-title" value="&lt;b&gt;8 MCP Tools&lt;/b&gt;" style="text;html=1;fontSize=12;align=center;verticalAlign=middle;fontColor=#333333;" vertex="1" parent="1">
+          <mxGeometry x="970" y="315" width="220" height="25" as="geometry" />
+        </mxCell>
+
+        <mxCell id="t1" value="list_work_orders" style="text;html=1;fontSize=10;align=left;fontColor=#9673a6;fontStyle=1;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="970" y="345" width="220" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="t1d" value="List all orders from CSV" style="text;html=1;fontSize=9;align=left;fontColor=#999999;spacingLeft=20;" vertex="1" parent="1">
+          <mxGeometry x="970" y="361" width="220" height="16" as="geometry" />
+        </mxCell>
+
+        <mxCell id="t2" value="get_work_order" style="text;html=1;fontSize=10;align=left;fontColor=#9673a6;fontStyle=1;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="970" y="380" width="220" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="t2d" value="Get details for one order" style="text;html=1;fontSize=9;align=left;fontColor=#999999;spacingLeft=20;" vertex="1" parent="1">
+          <mxGeometry x="970" y="396" width="220" height="16" as="geometry" />
+        </mxCell>
+
+        <mxCell id="t3" value="extract_constraints_tool" style="text;html=1;fontSize=10;align=left;fontColor=#d79b00;fontStyle=1;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="970" y="418" width="220" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="t4" value="assess_date_risk_tool" style="text;html=1;fontSize=10;align=left;fontColor=#d79b00;fontStyle=1;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="970" y="438" width="220" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="t5" value="assess_readiness_tool" style="text;html=1;fontSize=10;align=left;fontColor=#d79b00;fontStyle=1;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="970" y="458" width="220" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="t6" value="assess_safety_tool" style="text;html=1;fontSize=10;align=left;fontColor=#d79b00;fontStyle=1;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="970" y="478" width="220" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="t7" value="compose_scheduling_decision" style="text;html=1;fontSize=10;align=left;fontColor=#d79b00;fontStyle=1;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="970" y="498" width="220" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="t7d" value="Runs all 4 skills in sequence" style="text;html=1;fontSize=9;align=left;fontColor=#999999;spacingLeft=20;" vertex="1" parent="1">
+          <mxGeometry x="970" y="514" width="220" height="16" as="geometry" />
+        </mxCell>
+
+        <mxCell id="t8" value="lookup_delay_history_tool" style="text;html=1;fontSize=10;align=left;fontColor=#996185;fontStyle=1;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="970" y="537" width="220" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="t8d" value="NEW: Queries 709K real delay records" style="text;html=1;fontSize=9;align=left;fontColor=#999999;spacingLeft=20;" vertex="1" parent="1">
+          <mxGeometry x="970" y="553" width="220" height="16" as="geometry" />
         </mxCell>
 
       </root>
     </mxGraphModel>
   </diagram>
 
-  <diagram id="data-flow" name="Data Flow Per Work Order">
-    <mxGraphModel dx="1200" dy="820" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+  <diagram id="data-flow" name="Data Flow (ONEA92160383 Example)">
+    <mxGraphModel dx="1200" dy="820" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="600" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
 
         <!-- Title -->
-        <mxCell id="df-title" value="Data Flow: Scheduling Decision for One Work Order" style="text;html=1;fontSize=18;fontStyle=1;align=center;verticalAlign=middle;whiteSpace=wrap;" vertex="1" parent="1">
-          <mxGeometry x="200" y="20" width="600" height="40" as="geometry" />
+        <mxCell id="df-title" value="Data Flow: Real BT Order Through the Pipeline" style="text;html=1;fontSize=18;fontStyle=1;align=center;verticalAlign=middle;fontColor=#333333;" vertex="1" parent="1">
+          <mxGeometry x="250" y="10" width="450" height="30" as="geometry" />
         </mxCell>
 
-        <!-- Input -->
-        <mxCell id="df-csv-row" value="&lt;b&gt;CSV Row&lt;/b&gt;&lt;br&gt;order_id, service_type, job_type,&lt;br&gt;committed_delivery_date,&lt;br&gt;customer_notes (messy free text),&lt;br&gt;flags (dog, access, delay...)" style="shape=parallelogram;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=10;whiteSpace=wrap;perimeter=parallelogramPerimeter;" vertex="1" parent="1">
-          <mxGeometry x="60" y="80" width="250" height="90" as="geometry" />
+        <!-- ==================== LEFT: INPUT ==================== -->
+
+        <mxCell id="df-input" value="&lt;b style=&quot;font-size:12px&quot;&gt;ONEA92160383&lt;/b&gt;&lt;br&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px;color:#666&quot;&gt;FTTP Installation&lt;br&gt;Postcode: ZE3 9JS&lt;br&gt;Access issue: yes&lt;br&gt;PPE hint: overhead work&lt;br&gt;Notes: &quot;Access request sent...&lt;br&gt;engineers to attend 15/07...&lt;br&gt;CP could not accommodate...&quot;&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=11;align=left;spacingLeft=12;verticalAlign=top;spacingTop=8;arcSize=8;" vertex="1" parent="1">
+          <mxGeometry x="30" y="60" width="210" height="175" as="geometry" />
         </mxCell>
 
-        <!-- Skill A -->
-        <mxCell id="df-skill-a" value="&lt;b&gt;Skill A: Extract Constraints&lt;/b&gt;&lt;hr&gt;Input: customer_notes, dates&lt;br&gt;Output: earliest_allowed_date,&lt;br&gt;availability_window, instructions" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=10;align=left;spacingLeft=8;" vertex="1" parent="1">
-          <mxGeometry x="400" y="80" width="240" height="80" as="geometry" />
+        <!-- ==================== MIDDLE: SKILLS (numbered, vertical) ==================== -->
+
+        <mxCell id="df-s1-num" value="1" style="ellipse;fillColor=#d79b00;fontColor=#ffffff;fontStyle=1;fontSize=13;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="305" y="60" width="26" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="df-s1" value="&lt;b&gt;Extract Constraints&lt;/b&gt;    parses access requests, contact details, date references" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=10;align=left;spacingLeft=8;" vertex="1" parent="1">
+          <mxGeometry x="340" y="57" width="420" height="32" as="geometry" />
         </mxCell>
 
-        <!-- Skill B -->
-        <mxCell id="df-skill-b" value="&lt;b&gt;Skill B: Assess Date Risk&lt;/b&gt;&lt;hr&gt;Input: dates, flags, constraints&lt;br&gt;Output: date_change_recommended,&lt;br&gt;reason_code, revised_date" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=10;align=left;spacingLeft=8;" vertex="1" parent="1">
-          <mxGeometry x="400" y="190" width="240" height="80" as="geometry" />
+        <mxCell id="df-s2-num" value="2" style="ellipse;fillColor=#d79b00;fontColor=#ffffff;fontStyle=1;fontSize=13;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="305" y="107" width="26" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="df-s2" value="&lt;b&gt;Assess Date Risk&lt;/b&gt;    access issue flagged, date needs adjustment" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=10;align=left;spacingLeft=8;" vertex="1" parent="1">
+          <mxGeometry x="340" y="104" width="420" height="32" as="geometry" />
         </mxCell>
 
-        <!-- Skill C -->
-        <mxCell id="df-skill-c" value="&lt;b&gt;Skill C: Assess Visit Readiness&lt;/b&gt;&lt;hr&gt;Input: job_type, surface, photo, notes&lt;br&gt;Output: tools[], materials[],&lt;br&gt;duration_minutes, confidence" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=10;align=left;spacingLeft=8;" vertex="1" parent="1">
-          <mxGeometry x="400" y="300" width="240" height="80" as="geometry" />
+        <mxCell id="df-s3-num" value="3" style="ellipse;fillColor=#d79b00;fontColor=#ffffff;fontStyle=1;fontSize=13;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="305" y="154" width="26" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="df-s3" value="&lt;b&gt;Assess Readiness&lt;/b&gt;    fibre splicer, cable rod set, 120 min estimated" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=10;align=left;spacingLeft=8;" vertex="1" parent="1">
+          <mxGeometry x="340" y="151" width="420" height="32" as="geometry" />
         </mxCell>
 
-        <!-- Skill D -->
-        <mxCell id="df-skill-d" value="&lt;b&gt;Skill D: Assess Safety&lt;/b&gt;&lt;hr&gt;Input: dog_flag, PPE, exchange, notes&lt;br&gt;Output: safety_equipment[],&lt;br&gt;extra_engineer, risks[]" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=10;align=left;spacingLeft=8;" vertex="1" parent="1">
-          <mxGeometry x="400" y="410" width="240" height="80" as="geometry" />
+        <mxCell id="df-s4-num" value="4" style="ellipse;fillColor=#d79b00;fontColor=#ffffff;fontStyle=1;fontSize=13;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="305" y="201" width="26" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="df-s4" value="&lt;b&gt;Assess Safety&lt;/b&gt;    working at height flagged, hard hat with chin strap required" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=10;align=left;spacingLeft=8;" vertex="1" parent="1">
+          <mxGeometry x="340" y="198" width="420" height="32" as="geometry" />
         </mxCell>
 
-        <!-- Orchestrator -->
-        <mxCell id="df-orch" value="&lt;b&gt;Orchestrator&lt;/b&gt;&lt;br&gt;Composes all four skill&lt;br&gt;outputs into a single&lt;br&gt;SchedulingDecision" style="shape=hexagon;perimeter=hexagonPerimeter2;whiteSpace=wrap;html=1;fixedSize=1;size=20;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;" vertex="1" parent="1">
-          <mxGeometry x="700" y="210" width="180" height="100" as="geometry" />
+        <mxCell id="df-s5-num" value="5" style="ellipse;fillColor=#996185;fontColor=#ffffff;fontStyle=1;fontSize=13;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="305" y="248" width="26" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="df-s5" value="&lt;b&gt;Delay History&lt;/b&gt;    20 past delays: wayleave, CP info required, access failures" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e6d0de;strokeColor=#996185;fontSize=10;align=left;spacingLeft=8;" vertex="1" parent="1">
+          <mxGeometry x="340" y="245" width="420" height="32" as="geometry" />
         </mxCell>
 
-        <!-- Decision Output -->
-        <mxCell id="df-decision" value="&lt;b&gt;SchedulingDecision&lt;/b&gt;&lt;hr&gt;&lt;font style=&quot;font-size:9px&quot;&gt;recommended_action: schedule | reschedule | needs-human-review&lt;br&gt;planned_visit_date: 2026-04-12&lt;br&gt;required_tools: [fibre splicer, OTDR...]&lt;br&gt;safety_equipment: [steel toe boots...]&lt;br&gt;extra_engineer_required: false&lt;br&gt;rationale: [bullet list]&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=10;align=left;spacingLeft=8;" vertex="1" parent="1">
-          <mxGeometry x="700" y="370" width="280" height="130" as="geometry" />
-        </mxCell>
-
-        <!-- JSON Output -->
-        <mxCell id="df-json" value="&lt;b&gt;out/WO-003.json&lt;/b&gt;" style="shape=document;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=11;size=14;" vertex="1" parent="1">
-          <mxGeometry x="700" y="540" width="120" height="50" as="geometry" />
-        </mxCell>
-        <mxCell id="df-md" value="&lt;b&gt;out/WO-003.md&lt;/b&gt;" style="shape=document;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;size=14;" vertex="1" parent="1">
-          <mxGeometry x="850" y="540" width="120" height="50" as="geometry" />
-        </mxCell>
-
-        <!-- Arrows -->
-        <mxCell id="df-a1" style="strokeWidth=2;strokeColor=#b85450;" edge="1" parent="1" source="df-csv-row" target="df-skill-a">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="df-a2" style="strokeWidth=1;strokeColor=#b85450;dashed=1;" edge="1" parent="1" source="df-csv-row" target="df-skill-b">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="df-a3" style="strokeWidth=1;strokeColor=#b85450;dashed=1;" edge="1" parent="1" source="df-csv-row" target="df-skill-c">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="df-a4" style="strokeWidth=1;strokeColor=#b85450;dashed=1;" edge="1" parent="1" source="df-csv-row" target="df-skill-d">
+        <!-- Input -> Step 1 -->
+        <mxCell id="df-a1" style="rounded=1;strokeWidth=2;strokeColor=#b85450;exitX=1;exitY=0.15;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="df-input" target="df-s1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
 
-        <!-- Skill A feeds Skill B -->
-        <mxCell id="df-a-to-b" style="strokeWidth=2;strokeColor=#d79b00;" edge="1" parent="1" source="df-skill-a" target="df-skill-b">
+        <!-- Step flow arrows -->
+        <mxCell id="df-f1" style="strokeWidth=1;strokeColor=#d79b00;" edge="1" parent="1" source="df-s1" target="df-s2">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="df-a-to-b-label" value="constraints" style="edgeLabel;html=1;fontSize=9;" vertex="1" connectable="0" parent="df-a-to-b">
-          <mxGeometry x="-0.1" relative="1" as="geometry">
-            <mxPoint as="offset" />
+        <mxCell id="df-f2" style="strokeWidth=1;strokeColor=#d79b00;" edge="1" parent="1" source="df-s2" target="df-s3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="df-f3" style="strokeWidth=1;strokeColor=#d79b00;" edge="1" parent="1" source="df-s3" target="df-s4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="df-f4" style="strokeWidth=1;strokeColor=#996185;" edge="1" parent="1" source="df-s4" target="df-s5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- ==================== BOTTOM: DECISION ==================== -->
+
+        <mxCell id="df-decision" value="&lt;b style=&quot;font-size:13px;color:#cc6600&quot;&gt;RESCHEDULE&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=12;arcSize=8;" vertex="1" parent="1">
+          <mxGeometry x="30" y="310" width="210" height="40" as="geometry" />
+        </mxCell>
+
+        <mxCell id="df-detail" value="&lt;table style=&quot;font-size:11px;border-collapse:collapse;width:100%&quot;&gt;&lt;tr&gt;&lt;td style=&quot;padding:3px 8px;color:#666;width:110px&quot;&gt;Visit date&lt;/td&gt;&lt;td style=&quot;padding:3px 8px&quot;&gt;&lt;b&gt;2025-11-17&lt;/b&gt; (adjusted for access)&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;padding:3px 8px;color:#666&quot;&gt;Tools&lt;/td&gt;&lt;td style=&quot;padding:3px 8px&quot;&gt;fibre splicer, cable rod set, power meter, fibre cleaver&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;padding:3px 8px;color:#666&quot;&gt;Duration&lt;/td&gt;&lt;td style=&quot;padding:3px 8px&quot;&gt;120 minutes&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;padding:3px 8px;color:#666&quot;&gt;Safety&lt;/td&gt;&lt;td style=&quot;padding:3px 8px&quot;&gt;working at height, hard hat required&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;padding:3px 8px;color:#666&quot;&gt;Past delays&lt;/td&gt;&lt;td style=&quot;padding:3px 8px&quot;&gt;20 records (wayleave, CP info, access)&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;fontSize=11;align=left;verticalAlign=top;spacingTop=4;arcSize=8;" vertex="1" parent="1">
+          <mxGeometry x="30" y="360" width="440" height="115" as="geometry" />
+        </mxCell>
+
+        <mxCell id="df-rationale" value="&lt;b&gt;Rationale&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px;color:#555&quot;&gt;1. Access issue flagged -- date moved from Nov 15 to Nov 17&lt;br&gt;2. Working at height identified -- hard hat required&lt;br&gt;3. FTTP installation -- standard fibre toolkit needed&lt;br&gt;4. Historical delays: 20 past delays including wayleave&lt;br&gt;5. High risk of further delays based on delay pattern&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11;align=left;spacingLeft=10;verticalAlign=top;spacingTop=6;arcSize=8;" vertex="1" parent="1">
+          <mxGeometry x="500" y="310" width="340" height="115" as="geometry" />
+        </mxCell>
+
+        <!-- Step 5 -> Decision -->
+        <mxCell id="df-to-dec" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeWidth=2;strokeColor=#82b366;exitX=0;exitY=1;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="df-s5" target="df-decision">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="280" y="290" />
+              <mxPoint x="280" y="330" />
+            </Array>
           </mxGeometry>
         </mxCell>
-
-        <!-- Skills to Orchestrator -->
-        <mxCell id="df-sa-orch" style="strokeWidth=2;strokeColor=#82b366;" edge="1" parent="1" source="df-skill-a" target="df-orch">
+        <mxCell id="df-to-dec-label" value="Compose decision" style="edgeLabel;html=1;fontSize=10;fontColor=#82b366;" vertex="1" connectable="0" parent="df-to-dec">
           <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="df-sb-orch" style="strokeWidth=2;strokeColor=#82b366;" edge="1" parent="1" source="df-skill-b" target="df-orch">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="df-sc-orch" style="strokeWidth=2;strokeColor=#82b366;" edge="1" parent="1" source="df-skill-c" target="df-orch">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="df-sd-orch" style="strokeWidth=2;strokeColor=#82b366;" edge="1" parent="1" source="df-skill-d" target="df-orch">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-
-        <!-- Orchestrator to Decision -->
-        <mxCell id="df-orch-dec" style="strokeWidth=2;strokeColor=#82b366;" edge="1" parent="1" source="df-orch" target="df-decision">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-
-        <!-- Decision to outputs -->
-        <mxCell id="df-dec-json" style="strokeWidth=1;strokeColor=#b85450;dashed=1;" edge="1" parent="1" source="df-decision" target="df-json">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="df-dec-md" style="strokeWidth=1;strokeColor=#6c8ebf;dashed=1;" edge="1" parent="1" source="df-decision" target="df-md">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-
-        <!-- Step numbers -->
-        <mxCell id="step1" value="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d79b00;fontColor=#ffffff;fontStyle=1;fontSize=12;strokeColor=none;" vertex="1" parent="1">
-          <mxGeometry x="370" y="80" width="25" height="25" as="geometry" />
-        </mxCell>
-        <mxCell id="step2" value="2" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d79b00;fontColor=#ffffff;fontStyle=1;fontSize=12;strokeColor=none;" vertex="1" parent="1">
-          <mxGeometry x="370" y="190" width="25" height="25" as="geometry" />
-        </mxCell>
-        <mxCell id="step3" value="3" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d79b00;fontColor=#ffffff;fontStyle=1;fontSize=12;strokeColor=none;" vertex="1" parent="1">
-          <mxGeometry x="370" y="300" width="25" height="25" as="geometry" />
-        </mxCell>
-        <mxCell id="step4" value="4" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d79b00;fontColor=#ffffff;fontStyle=1;fontSize=12;strokeColor=none;" vertex="1" parent="1">
-          <mxGeometry x="370" y="410" width="25" height="25" as="geometry" />
-        </mxCell>
-        <mxCell id="step5" value="5" style="ellipse;whiteSpace=wrap;html=1;fillColor=#82b366;fontColor=#ffffff;fontStyle=1;fontSize=12;strokeColor=none;" vertex="1" parent="1">
-          <mxGeometry x="670" y="210" width="25" height="25" as="geometry" />
         </mxCell>
 
       </root>

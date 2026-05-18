@@ -13,3 +13,9 @@ playwright-report/
 .nyc_output/
 *.tsbuildinfo
 .vite/
+
+# Local-only artefacts that shouldn't be committed.
+# Stale PSO sample zip — superseded by scheduling/out/pso_payloads/
+bt-openreach-pso-samples.zip
+# Unrelated architecture image left over from another project
+scheduling/docs/fa_learning_coach_architecture.png

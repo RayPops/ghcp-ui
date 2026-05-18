@@ -15,10 +15,11 @@ from __future__ import annotations
 import uuid
 from dataclasses import dataclass, field
 from datetime import date, datetime, time, timedelta, timezone
-from typing import Callable
+from typing import Callable, Optional
 from xml.etree import ElementTree as ET
 
 from app.models import SchedulingDecision, WorkOrder
+from app.sla_guardrail import apply_sla_guardrail
 
 from . import mappings
 
@@ -90,16 +91,34 @@ def build_pso_inputs(
     decision: SchedulingDecision,
     order: WorkOrder,
     coordinates: tuple[float, float],
+    *,
+    today: Optional[date] = None,
 ) -> PsoTaskInputs:
     """Compose a :class:`PsoTaskInputs` from a decision + the source order.
 
     ``coordinates`` must be ``(latitude, longitude)`` in WGS84.
+
+    ``today`` (default :func:`datetime.date.today`) drives the SLA guardrail
+    (see ``app.sla_guardrail``): any committed delivery date in the past is
+    rolled forward to ``today + 1 business day`` so PSO never receives an
+    Activity whose soonest/latest start times are in the past.
     """
+    if today is None:
+        today = date.today()
+
     latitude, longitude = coordinates
 
+    # SLA guardrail: shift past committed dates before any planning math.
+    guardrail = apply_sla_guardrail(order.committed_delivery_date, today)
+    effective_committed = guardrail.effective_date
+
     # Planned date: prefer the decision's planned_visit_date; fall back to
-    # the order's committed delivery date. Always snap to a working day.
-    planned = decision.planned_visit_date or order.committed_delivery_date
+    # the (guardrail-adjusted) committed delivery date. If the decision's
+    # planned date is itself in the past, the guardrail also shifts it so
+    # PSO never sees a stale SLA.
+    planned = decision.planned_visit_date or effective_committed
+    if planned < today:
+        planned = apply_sla_guardrail(planned, today).effective_date
     planned = _next_working_day(planned)
 
     soonest = _at_utc(planned, _DEFAULT_DAY_START_HOUR)

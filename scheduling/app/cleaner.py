@@ -20,6 +20,7 @@ import logging
 import sys
 from collections import Counter
 from dataclasses import dataclass
+from datetime import date
 from pathlib import Path
 from typing import Optional
 
@@ -102,8 +103,14 @@ def run_cleaning(
     input_csv: Path,
     output_dir: Path,
     delay_csv: Optional[Path] = None,
+    today: Optional[date] = None,
 ) -> CleaningSummary:
-    """End-to-end raw -> cleaned + action log. Pure orchestration, no CLI parsing."""
+    """End-to-end raw -> cleaned + action log. Pure orchestration, no CLI parsing.
+
+    ``today`` is threaded into :func:`aggregator.aggregate` so the SLA
+    guardrail can shift any committed delivery dates that are in the past.
+    Defaults to :func:`datetime.date.today`.
+    """
     output_dir.mkdir(parents=True, exist_ok=True)
     cleaned_csv_path = output_dir / "work_orders_cleaned.csv"
     action_log_path = output_dir / "agent_actions.jsonl"
@@ -122,7 +129,7 @@ def run_cleaning(
         for order in orders:
             decision = process_work_order(order)
             delays = _try_lookup_delays(order.order_id, delay_csv)
-            agg = aggregate(order, decision, delays)
+            agg = aggregate(order, decision, delays, today=today)
 
             writer.writerow(agg.cleaned_row)
             # Newline-delimited JSON: one object per line, no array wrapper.
