@@ -1,4 +1,4 @@
-import { MessageSquare, Github, Menu, Settings, FolderOpen, LogOut, User } from "lucide-react";
+import { RadioTower, Github, Menu, Settings, FolderOpen, LogOut, User } from "lucide-react";
 
 interface HeaderProps {
   sessionModel: string | null;
@@ -22,15 +22,15 @@ export function Header({ sessionModel, isConnected, onToggleSidebar, onOpenSetti
         </button>
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-lg bg-brand-600 flex items-center justify-center">
-            <MessageSquare className="w-4 h-4 text-white" />
+            <RadioTower className="w-4 h-4 text-white" />
           </div>
           <h1 className="text-lg font-semibold tracking-tight">
-            GHCP
-            <span className="text-brand-400 ml-1">UI</span>
+            Openreach
+            <span className="text-brand-400 ml-1">DispatchAI</span>
           </h1>
         </div>
         <span className="text-xs text-zinc-500 hidden sm:inline">
-          GitHub Copilot • Web
+          Field scheduling copilot
         </span>
       </div>
 

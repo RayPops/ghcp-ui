@@ -5,6 +5,8 @@ import { ChatContainer } from "./components/ChatContainer";
 import { InputBar } from "./components/InputBar";
 import { SettingsDrawer, type McpServerEntry } from "./components/SettingsDrawer";
 import { WorkspacePanel } from "./components/WorkspacePanel";
+import { WorkOrdersPane } from "./components/WorkOrdersPane";
+import { ActionTrailPane } from "./components/ActionTrailPane";
 import { useChat } from "./hooks/useChat";
 import { useSessions } from "./hooks/useSessions";
 
@@ -16,6 +18,16 @@ export default function App() {
   const [activeFolder, setActiveFolder] = useState("");
   const [resumingId, setResumingId] = useState<string | null>(null);
   const [userName, setUserName] = useState<string>("");
+  /**
+   * Prefill payload pushed into the InputBar when the user clicks a button
+   * in the Work Orders pane. ``nonce`` ensures the same prompt twice in a
+   * row still re-runs the effect that fills the textarea.
+   */
+  const [inputPrefill, setInputPrefill] = useState<{ text: string; nonce: number } | null>(null);
+
+  const handlePrefillPrompt = useCallback((text: string) => {
+    setInputPrefill({ text, nonce: Date.now() });
+  }, []);
 
   // Fetch user identity
   useEffect(() => {
@@ -31,6 +43,7 @@ export default function App() {
     error,
     currentSession,
     activeTools,
+    actionTrail,
     streamingContent,
     createSession,
     sendMessage,
@@ -154,6 +167,8 @@ export default function App() {
           resumingId={resumingId}
         />
 
+        <WorkOrdersPane onPrefillPrompt={handlePrefillPrompt} />
+
         <div className="flex-1 flex flex-col min-w-0">
           {resumingId ? (
             <div className="flex-1 flex items-center justify-center">
@@ -178,8 +193,11 @@ export default function App() {
             onStop={stopGeneration}
             isLoading={isLoading}
             disabled={currentSession === null}
+            prefill={inputPrefill}
           />
         </div>
+
+        <ActionTrailPane entries={actionTrail} />
       </div>
 
       <SettingsDrawer

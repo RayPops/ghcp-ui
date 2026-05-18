@@ -3,9 +3,14 @@ import { test, expect } from "@playwright/test";
 test.describe("GHCP UI", () => {
   test("loads the homepage with header and branding", async ({ page }) => {
     await page.goto("/");
-    // Header should show GHCP UI branding
-    await expect(page.locator("h1")).toContainText("GHCP");
-    await expect(page.locator("h1")).toContainText("UI");
+    // Header should show the Openreach DispatchAI brand
+    await expect(page.locator("h1")).toContainText("Openreach");
+    await expect(page.locator("h1")).toContainText("DispatchAI");
+  });
+
+  test("document title is Openreach DispatchAI", async ({ page }) => {
+    await page.goto("/");
+    await expect(page).toHaveTitle("Openreach DispatchAI");
   });
 
   test("shows disconnected state initially", async ({ page }) => {
@@ -84,7 +89,7 @@ test.describe("PWA", () => {
     await expect(statusBar).toHaveAttribute("content", "black-translucent");
     // Apple title
     const appleTitle = page.locator('meta[name="apple-mobile-web-app-title"]');
-    await expect(appleTitle).toHaveAttribute("content", "GHCP UI");
+    await expect(appleTitle).toHaveAttribute("content", "Openreach DispatchAI");
   });
 
   test("has apple-touch-icon link", async ({ page }) => {
@@ -357,5 +362,122 @@ test.describe("User MCP Config", () => {
     await page.getByLabel("Settings").click();
     await expect(page.getByText("Your Servers")).toBeVisible({ timeout: 5000 });
     await expect(page.getByText("Add MCP Server")).toBeVisible();
+  });
+});
+
+test.describe("Work Orders pane", () => {
+  test("GET /api/scheduling/work-orders returns 12 orders with expected fields", async ({ request }) => {
+    const res = await request.get("/api/scheduling/work-orders");
+    expect(res.ok()).toBeTruthy();
+    const body = await res.json();
+    expect(body).toHaveProperty("orders");
+    expect(body).toHaveProperty("count");
+    expect(body.count).toBe(12);
+    expect(body.orders).toHaveLength(12);
+
+    // Spot-check the first order has the mapped camelCase fields the UI expects.
+    const sample = body.orders[0];
+    for (const key of [
+      "orderId",
+      "orderSource",
+      "serviceType",
+      "jobType",
+      "postcode",
+      "customerReadyStatus",
+      "committedDeliveryDate",
+    ]) {
+      expect(sample, `missing ${key}`).toHaveProperty(key);
+    }
+    expect(typeof sample.orderId).toBe("string");
+  });
+
+  test("every order id is unique (mirrors the postcode-uniqueness backend test)", async ({ request }) => {
+    const res = await request.get("/api/scheduling/work-orders");
+    const body = await res.json();
+    const ids = body.orders.map((o: { orderId: string }) => o.orderId);
+    const unique = new Set(ids);
+    expect(unique.size).toBe(ids.length);
+  });
+
+  test("pane renders all 12 rows on the page", async ({ page, viewport: _vp }) => {
+    // Force a wide viewport so the pane is not hidden by the responsive breakpoint.
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await page.goto("/");
+    await expect(page.getByTestId("work-orders-pane")).toBeVisible({ timeout: 10000 });
+    await expect(page.getByTestId("work-orders-count")).toHaveText("12");
+    await expect(page.getByTestId("work-order-row")).toHaveCount(12);
+  });
+
+  test("Details button prefills the input with 'Tell me about <id>'", async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await page.goto("/");
+    await page.waitForTimeout(1500);
+
+    // Start a chat so the input bar is enabled
+    await page.getByLabel("Toggle sidebar").click();
+    await page.getByRole("button", { name: "New Chat", exact: true }).click();
+    await expect(page.getByRole("banner").getByText("gpt-5.4")).toBeVisible({ timeout: 15000 });
+
+    // Click Details on the first order
+    const firstRow = page.getByTestId("work-order-row").first();
+    const firstOrderId = await firstRow.getAttribute("data-order-id");
+    expect(firstOrderId).toMatch(/^ONEA\d+$/);
+    await firstRow.getByTestId("work-order-details-btn").click();
+
+    const textarea = page.locator("textarea");
+    await expect(textarea).toHaveValue(`Tell me about ${firstOrderId}`);
+  });
+
+  test("Schedule button prefills the input with 'Schedule <id> and push to PSO'", async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await page.goto("/");
+    await page.waitForTimeout(1500);
+
+    await page.getByLabel("Toggle sidebar").click();
+    await page.getByRole("button", { name: "New Chat", exact: true }).click();
+    await expect(page.getByRole("banner").getByText("gpt-5.4")).toBeVisible({ timeout: 15000 });
+
+    const firstRow = page.getByTestId("work-order-row").first();
+    const firstOrderId = await firstRow.getAttribute("data-order-id");
+    await firstRow.getByTestId("work-order-schedule-btn").click();
+
+    const textarea = page.locator("textarea");
+    await expect(textarea).toHaveValue(`Schedule ${firstOrderId} and push to PSO`);
+  });
+
+  test("filter narrows the visible rows", async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await page.goto("/");
+    await expect(page.getByTestId("work-order-row")).toHaveCount(12);
+
+    await page.getByLabel("Filter work orders").fill("FTTP");
+    // ONEA92160383 is the only FTTP order in the seed CSV.
+    await expect(page.getByTestId("work-order-row")).toHaveCount(1);
+  });
+});
+
+test.describe("Action Trail pane", () => {
+  test("renders with empty placeholder before any tool fires", async ({ page }) => {
+    await page.setViewportSize({ width: 1400, height: 900 });
+    await page.goto("/");
+    await expect(page.getByTestId("action-trail-pane")).toBeVisible({ timeout: 10000 });
+    await expect(page.getByTestId("action-trail-pane")).toContainText("Nothing yet");
+    // No entries yet — the counter should not render.
+    await expect(page.getByTestId("action-trail-count")).toHaveCount(0);
+  });
+
+  test("pane stays visible after a session is created", async ({ page }) => {
+    await page.setViewportSize({ width: 1400, height: 900 });
+    await page.goto("/");
+    await page.waitForTimeout(1500);
+
+    await page.getByLabel("Toggle sidebar").click();
+    await page.getByRole("button", { name: "New Chat", exact: true }).click();
+    await expect(page.getByRole("banner").getByText("gpt-5.4")).toBeVisible({ timeout: 15000 });
+
+    // Trail pane still visible and still showing the empty state — no tools
+    // have fired yet.
+    await expect(page.getByTestId("action-trail-pane")).toBeVisible();
+    await expect(page.getByTestId("action-trail-pane")).toContainText("Nothing yet");
   });
 });

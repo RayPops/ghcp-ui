@@ -23,14 +23,35 @@ interface InputBarProps {
   onStop: () => void;
   isLoading: boolean;
   disabled: boolean;
+  /**
+   * Programmatic prefill — when this object reference changes, the textarea is
+   * reset to ``text`` and focused so the user can review and press Enter. The
+   * ``nonce`` field lets the parent prefill the same string twice in a row.
+   */
+  prefill?: { text: string; nonce: number } | null;
 }
 
-export function InputBar({ onSend, onStop, isLoading, disabled }: InputBarProps) {
+export function InputBar({ onSend, onStop, isLoading, disabled, prefill }: InputBarProps) {
   const [input, setInput] = useState("");
   const [voiceLang, setVoiceLang] = useState(getSavedVoiceLang);
   const [showLangPicker, setShowLangPicker] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const langPickerRef = useRef<HTMLDivElement>(null);
+
+  // Apply external prefill requests (e.g. from the Work Orders pane).
+  useEffect(() => {
+    if (prefill && prefill.text) {
+      setInput(prefill.text);
+      requestAnimationFrame(() => {
+        const ta = textareaRef.current;
+        if (ta) {
+          ta.focus();
+          ta.selectionStart = ta.selectionEnd = ta.value.length;
+        }
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [prefill]);
 
   const handleSttResult = useCallback((transcript: string) => {
     setInput(transcript);

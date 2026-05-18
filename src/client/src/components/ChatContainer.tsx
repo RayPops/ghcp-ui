@@ -35,12 +35,12 @@ export function ChatContainer({
             <Sparkles className="w-8 h-8 text-brand-400" />
           </div>
           <h2 className="text-2xl font-semibold mb-3">
-            Welcome to GHCP UI
+            Welcome to Openreach DispatchAI
           </h2>
           <p className="text-zinc-500 text-sm mb-6 leading-relaxed">
-            A web interface for GitHub Copilot SDK.
-            Create a new session to start chatting with Copilot,
-            powered by Azure AI Foundry.
+            Your scheduling copilot for BT Openreach field operations.
+            Start a chat to triage work orders, run the scheduling skills,
+            and push live activities into IFS PSO.
           </p>
           <button
             onClick={onNewSession}

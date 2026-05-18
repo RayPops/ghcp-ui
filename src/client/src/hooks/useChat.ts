@@ -1,7 +1,39 @@
 import { useState, useCallback, useRef } from "react";
-import type { ChatMessage, ToolEvent, SessionInfo } from "../types";
+import type { ActionTrailEntry, ChatMessage, ToolEvent, SessionInfo } from "../types";
 
 const API_BASE = "/api";
+
+/**
+ * Build a short, plain-text summary for the Action Trail from a raw tool
+ * result. The server already truncates the SDK content to 500 chars; we
+ * further trim and try to surface the most useful first line.
+ */
+function summariseToolContent(content: string | undefined): string | undefined {
+  if (!content) return undefined;
+  const trimmed = content.trim();
+  if (!trimmed) return undefined;
+  // If the content is JSON, prefer a one-line gist over the full blob.
+  if (trimmed.startsWith("{") || trimmed.startsWith("[")) {
+    try {
+      const parsed = JSON.parse(trimmed);
+      if (Array.isArray(parsed)) {
+        return `${parsed.length} item(s)`;
+      }
+      if (parsed && typeof parsed === "object") {
+        // Promote a handful of fields the scheduling MCP tools commonly return.
+        const promoted = ["recommended_action", "decision", "http_status", "success", "order_id"]
+          .filter((k) => k in parsed)
+          .map((k) => `${k}: ${String((parsed as Record<string, unknown>)[k])}`)
+          .join(" · ");
+        if (promoted) return promoted;
+      }
+    } catch {
+      // Not JSON — fall through to the raw-text path.
+    }
+  }
+  const oneLine = trimmed.replace(/\s+/g, " ");
+  return oneLine.length > 240 ? `${oneLine.slice(0, 237)}…` : oneLine;
+}
 
 export function useChat() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -11,6 +43,12 @@ export function useChat() {
     null
   );
   const [activeTools, setActiveTools] = useState<ToolEvent[]>([]);
+  /**
+   * Persistent audit trail for the current session. Accumulates across every
+   * ``sendMessage`` call so the Action Trail pane can show what the agent
+   * has done all session, not just the current turn.
+   */
+  const [actionTrail, setActionTrail] = useState<ActionTrailEntry[]>([]);
   const [streamingContent, setStreamingContent] = useState("");
   const abortRef = useRef<AbortController | null>(null);
 
@@ -65,6 +103,7 @@ export function useChat() {
         const session: SessionInfo = await res.json();
         setCurrentSession(session);
         setMessages([]);
+        setActionTrail([]);
         return session;
       } catch (err) {
         const msg =
@@ -82,6 +121,9 @@ export function useChat() {
       if (res.ok) {
         const msgs: ChatMessage[] = await res.json();
         setMessages(msgs);
+        // Switching sessions resets the in-memory audit trail. The trail
+        // is per-session and not persisted server-side.
+        setActionTrail([]);
       }
     } catch {
       // Silently fail
@@ -215,6 +257,28 @@ export function useChat() {
                   };
                   toolEvents.push(evt);
                   scheduleToolUpdate();
+
+                  // Record into the persistent action trail. Pair with the
+                  // matching tool_start to recover the tool name (the
+                  // complete event does not carry it).
+                  const startEvt = [...toolEvents]
+                    .reverse()
+                    .find(
+                      (e) => e.type === "start" && e.toolCallId === data.toolCallId
+                    );
+                  const trailEntry: ActionTrailEntry = {
+                    id: `${data.toolCallId ?? crypto.randomUUID()}-${Date.now()}`,
+                    timestamp: evt.timestamp,
+                    toolName: startEvt?.toolName ?? "tool",
+                    mcpServerName: startEvt?.mcpServerName,
+                    success: data.success !== false,
+                    summary: summariseToolContent(
+                      typeof data.content === "string" ? data.content : undefined
+                    ),
+                    error: typeof data.error === "string" ? data.error : undefined,
+                    triggeredBy: prompt,
+                  };
+                  setActionTrail((prev) => [...prev, trailEntry]);
                   break;
                 }
 
@@ -338,6 +402,7 @@ export function useChat() {
     error,
     currentSession,
     activeTools,
+    actionTrail,
     streamingContent,
     createSession,
     sendMessage,

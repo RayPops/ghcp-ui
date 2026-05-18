@@ -18,6 +18,7 @@ import { createChatRoutes } from "./routes/chat.routes.js";
 import { createSessionRoutes } from "./routes/sessions.routes.js";
 import { createWorkspaceRoutes } from "./routes/workspace.routes.js";
 import healthRoutes from "./routes/health.routes.js";
+import schedulingRoutes from "./routes/scheduling.routes.js";
 import { easyAuthMiddleware } from "./middleware/auth.middleware.js";
 
 // Application Insights — must be initialized before other imports
@@ -64,6 +65,7 @@ async function main() {
   app.use("/api/sessions", createSessionRoutes(copilot, workspace));
   app.use("/api/chat", createChatRoutes(copilot));
   app.use("/api/workspace", createWorkspaceRoutes(workspace));
+  app.use("/api/scheduling", schedulingRoutes);
 
   // Global MCP servers endpoint (admin-configured, read-only, no secrets)
   app.get("/api/mcp-servers", (_req, res) => {
